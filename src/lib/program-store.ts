@@ -54,7 +54,7 @@ export class ProgramStore {
   readonly #createId: () => string;
 
   constructor(
-    filename = "data/crowdfm.sqlite",
+    filename = ".crowdfm/crowdfm.sqlite",
     now: () => number = Date.now,
     createId: () => string = randomUUID,
   ) {
