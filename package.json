@@ -13,6 +13,7 @@
     "test:e2e": "next build && playwright test"
   },
   "dependencies": {
+    "music-metadata": "11.12.1",
     "next": "16.2.9",
     "openai": "^6.16.0",
     "react": "^19.2.0",

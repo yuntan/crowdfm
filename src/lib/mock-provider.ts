@@ -1,4 +1,5 @@
 import type { ListenerRequest, Track } from "@/lib/domain";
+import { getOpenAIProductionProvider } from "@/lib/openai-provider";
 import type { ProductionProvider, ShowPlan } from "@/lib/production";
 
 const previewTrack: Track = {
@@ -51,6 +52,9 @@ declare global {
 }
 
 export function getProductionProvider(): ProductionProvider {
+  if (process.env.CROWDFM_PROVIDER === "openai") {
+    return getOpenAIProductionProvider();
+  }
   globalThis.crowdFmMockProvider ??= new MockProductionProvider();
   return globalThis.crowdFmMockProvider;
 }
