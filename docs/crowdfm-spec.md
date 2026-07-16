@@ -8,8 +8,8 @@ Last updated: 2026-07-16
 
 1. CrowdFM is an English-language web application, not a native mobile app. The UI, generated host speech, and hackathon demo are all in English because judging is conducted in English.
 2. The hackathon submission prioritizes the isolated demo mode described below. The eventual product remains one shared scheduled station.
-3. The server runs as a long-lived Node.js process. The MVP does not target an ephemeral serverless runtime.
-4. SQLite and local generated-audio storage are acceptable for the judged demo period.
+3. The MVP runs and is verified only on the developer's local machine. Cloud deployment and public hosting are out of scope.
+4. The local server runs as a long-lived Node.js process with SQLite and local generated-audio storage.
 5. Only curated, license-checked YouTube videos are eligible for selection.
 6. A submitted demo request is guaranteed to be selected. Normal broadcasts will not guarantee selection.
 7. OpenAI Realtime API is out of scope because the show is produced before broadcast.
@@ -41,7 +41,7 @@ The primary audience for the hackathon demo is a judge who must understand the f
 
 ### Request form
 
-The public page requires no account. It accepts:
+The local demo page requires no account. It accepts:
 
 - `radioName`: 1–30 characters.
 - `message`: 20–760 characters containing the listener's story and, optionally, a requested song, artist, mood, moment, or musical direction. There is no separate theme field.
@@ -68,7 +68,7 @@ When the show becomes ready, the page changes visibly and plays one short notifi
 
 The listener presses a single `Tune in` button before playback. This user gesture initializes HTML audio and the YouTube player so browser autoplay rules do not silently block the broadcast.
 
-When ready, demo mode sets `startsAt` a few seconds in the future and displays a countdown. Playback then follows the server-authored timeline. Custom pause, seek, replay, and skip controls do not exist. YouTube's standard player is embedded through the official IFrame Player API with visible controls disabled.
+When ready, demo mode sets `startsAt` to exactly 15 seconds after the program enters `READY` and displays the countdown. Playback then follows the server-authored timeline. Custom pause, seek, replay, and skip controls do not exist. YouTube's standard player is embedded through the official IFrame Player API with visible controls disabled.
 
 If a listener reloads or joins late, the client calculates the current segment from the server time and starts at that segment's elapsed offset rather than from the beginning.
 
@@ -80,7 +80,7 @@ The demo show contains one request and one track:
 2. Radio name and listener message.
 3. Host response.
 4. Track selection and reason.
-5. YouTube track playback.
+5. A configured excerpt of the YouTube track, starting at the beginning and ending around the first chorus.
 6. Short closing.
 
 For the submitted video, waiting time and music playback may be shortened in editing, but the underlying application must execute the real production flow.
@@ -98,7 +98,7 @@ For the submitted video, waiting time and music playback may be shortened in edi
 - OpenAI JavaScript SDK.
 - YouTube IFrame Player API.
 
-The production host must support a long-running Node process and writable persistent storage. A serverless-only deployment is not an MVP target.
+The demo runs locally in one long-running Node process with a writable SQLite database and generated-audio directory. No cloud deployment is required.
 
 ## OpenAI Integration
 
@@ -162,6 +162,7 @@ const TrackSchema = z.object({
   artist: z.string(),
   durationMs: z.number().int().positive(),
   startSeconds: z.number().min(0).default(0),
+  endSeconds: z.number().positive(),
   tags: z.array(z.string()),
   mood: z.array(z.string()),
   hasVocals: z.boolean(),
@@ -173,7 +174,9 @@ const TrackSchema = z.object({
 });
 ```
 
-The model cannot invent a video ID or choose outside this catalog. Before recording the demo, every video must be manually smoke-tested for embedding, playback, duration, and geographic availability in the demo environment.
+For the hackathon demo, `startSeconds` is `0`. `endSeconds` is chosen per track at or just after the first chorus begins, and catalog validation enforces `startSeconds < endSeconds <= durationMs / 1000`. The exact tracks and excerpt boundaries will be decided later.
+
+The model cannot invent a video ID or choose outside this catalog. Before recording the demo, every video must be manually smoke-tested locally for embedding, playback, duration, and geographic availability.
 
 ## Program Timeline Contract
 
@@ -194,6 +197,7 @@ type ProgramSegment =
       durationMs: number;
       videoId: string;
       startSeconds: number;
+      endSeconds: number;
       title: string;
       artist: string;
     };
@@ -207,7 +211,7 @@ interface ProgramTimeline {
 }
 ```
 
-`startsAtMs` is relative to the start of the show. Segments must be ordered, non-overlapping, gap-free, and contained within `durationMs`.
+`startsAtMs` is relative to the start of the show. Segments must be ordered, non-overlapping, gap-free, and contained within `durationMs`. A YouTube segment's `durationMs` equals `(endSeconds - startSeconds) * 1000`.
 
 ## Server State Model
 
@@ -270,7 +274,6 @@ Failures:
 
 - `422 VALIDATION_ERROR`
 - `422 REQUEST_REJECTED`
-- `429 RATE_LIMITED`
 - `503 PRODUCTION_UNAVAILABLE`
 
 ### `GET /api/programs/:programId`
@@ -309,7 +312,7 @@ Failures:
 4. At or after `startsAt`, calculate `elapsedMs = estimatedServerNow - startsAt`.
 5. Select the segment containing `elapsedMs`.
 6. For speech, set the HTML audio element's `currentTime` to the segment-relative offset.
-7. For YouTube, call `loadVideoById` with the catalog video ID and calculated `startSeconds`.
+7. For YouTube, call object-form `loadVideoById` with the catalog video ID, the calculated segment-relative `startSeconds`, and the catalog `endSeconds`.
 8. Listen for YouTube `onStateChange`, `onError`, and `onAutoplayBlocked` events.
 9. If autoplay is blocked, show a blocking `Tap to return to the broadcast` action.
 10. If a segment fails, show a station error and continue to the next segment only when the server timeline says it has started.
@@ -424,7 +427,7 @@ export function toDisplayStage(status: ProgramStatus): DisplayStage {
 - Confirm that playback controls are absent.
 - Reload during playback and resume at the calculated broadcast position.
 
-The real OpenAI and YouTube integration is tested manually before recording the submission video. CI must not spend API credits or depend on public video availability.
+The real OpenAI and YouTube integration is tested manually on the local demo machine before recording the submission video. Automated tests must not spend API credits or depend on public video availability.
 
 ## Boundaries
 
@@ -441,7 +444,7 @@ The real OpenAI and YouTube integration is tested manually before recording the 
 - Add an external database, queue, object store, authentication provider, or email service.
 - Change the public REST contract or timeline schema.
 - Add arbitrary YouTube search.
-- Deploy to a platform without persistent process and storage guarantees.
+- Deploy the MVP or add any cloud infrastructure.
 
 ### Never
 
@@ -455,14 +458,14 @@ The real OpenAI and YouTube integration is tested manually before recording the 
 
 ## Success Criteria
 
-1. A judge can open a public URL and submit a request without authentication.
+1. A demo operator can open the local URL and submit a request without authentication.
 2. Invalid or moderated requests fail with a clear, stable error.
 3. A valid request produces a schema-valid show plan using `gpt-5.6`.
 4. The selected track always belongs to the curated catalog.
 5. Two speech assets are generated using `gpt-4o-mini-tts`.
 6. The finished program contains a gap-free speech → YouTube → speech timeline.
 7. The page shows production progress and an in-page/audio completion notification.
-8. The listener enters through one user gesture and sees a scheduled countdown.
+8. The listener enters through one user gesture and sees a 15-second scheduled countdown.
 9. Playback provides no pause, seek, replay, or skip UI.
 10. Reloading during the show resumes at the current broadcast position.
 11. AI-voice disclosure and track licensing/source information are visible.
@@ -480,13 +483,13 @@ The real OpenAI and YouTube integration is tested manually before recording the 
 - Human editorial review.
 - Multi-client drift correction demonstration.
 - Archive playback.
+- Cloud deployment and public hosting.
+- Public-environment abuse protection such as distributed rate limiting.
 
 ## Open Questions for Review
 
-1. Is a long-lived Node host with SQLite and local audio storage acceptable for the judged deployment, or should storage be externalized before implementation?
+1. Which 5–10 licensed tracks will be used, and what is the per-track `endSeconds` boundary near the first chorus?
 2. Which English TTS voice wins the audition among `marin`, `coral`, and `shimmer`?
-3. How many seconds before airtime should a ready demo program start?
-4. Should the post-track closing wait for the full YouTube track, or should the demo catalog use a deliberately short licensed track?
 
 ## Documentation Sources
 

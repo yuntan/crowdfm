@@ -81,7 +81,7 @@ AIパーソナリティーの例（英語音声・英語字幕）:
 
 画面:
 
-- 公開URLを開く。
+- ローカルのデモURLを開く。
 - ログインなしでフォームを入力する。
 - `Radio name`と`Message`だけが見えるようにする。選曲テーマはMessage本文に含める。
 - `Create my show` を押す。
@@ -125,7 +125,7 @@ Waiting shortened for this video
 - `Your show is ready`
 - 短い通知音。
 - `Tune in` を押す。
-- 5秒程度のカウントダウン。
+- `READY`から放送開始までの15秒カウントダウン。
 - `AI-generated host and voice` の表示。
 
 英語ナレーション:
@@ -166,7 +166,7 @@ AIパーソナリティーの台本例（英語音声）:
 
 > The browser now follows a server-authored timeline, switching from generated speech to the approved YouTube track. The listener cannot pause, skip, or restart the show.
 
-音楽を聴かせるのは5〜8秒程度。ナレーションと重なる場合は音量を下げる。
+アプリでは曲の冒頭から、曲ごとに設定した最初のサビ付近までを再生してエンディングトークへ切り替える。動画内で音楽を聴かせるのは5〜8秒程度とし、残りは編集で短縮する。ナレーションと重なる場合は音量を下げる。
 
 ### 2:13–2:34 — 技術の中核
 
@@ -246,11 +246,13 @@ Speech → YouTube → Speech timeline
 
 ### アプリ
 
-- [ ] 公開URLをシークレットウィンドウから開ける。
+- [ ] ローカルのデモURLを新しいブラウザプロファイルから開ける。
 - [ ] ログインなしで送信できる。
 - [ ] モデレーション、台本、TTSが本番APIで成功する。
 - [ ] 選ばれた曲が必ず登録済みカタログにある。
 - [ ] YouTube動画をデモ環境で埋め込み再生できる。
+- [ ] `READY`から15秒後に放送が始まる。
+- [ ] 曲の冒頭から設定済みのサビ付近まで再生し、エンディングトークへ切り替わる。
 - [ ] 生成音声とYouTubeの切り替えに不自然な無音がない。
 - [ ] `Tune in` の一回の操作で音声再生を開始できる。
 - [ ] AI音声であることを表示している。
