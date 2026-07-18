@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   analyzePcm16le,
+  buildSunoCatalog,
   parseSunoBatch,
   rankCandidates,
   type AudioAnalysis,
+  type SunoBatch,
 } from "@/lib/suno-import";
 
 function pcmWithAmplitudeSections(
@@ -107,6 +109,20 @@ describe("analyzePcm16le", () => {
     expect(result.clippingRatio).toBeGreaterThan(0);
     expect(Number.isFinite(result.meanRmsDb)).toBe(true);
   });
+
+  it("prefers an earlier credible hook over a larger late-song lift", () => {
+    const pcm = pcmWithAmplitudeSections([
+      { seconds: 20, amplitude: 0.05, period: 40 },
+      { seconds: 25, amplitude: 0.18, period: 24 },
+      { seconds: 25, amplitude: 0.8, period: 11 },
+    ]);
+
+    const result = analyzePcm16le(pcm, 1_000);
+
+    expect(result.hookStartMs).toBeGreaterThanOrEqual(18_000);
+    expect(result.hookStartMs).toBeLessThanOrEqual(25_000);
+    expect(result.excerptEndMs).toBeLessThanOrEqual(37_000);
+  });
 });
 
 describe("rankCandidates", () => {
@@ -137,5 +153,84 @@ describe("rankCandidates", () => {
       "candidate-b",
     ]);
     expect(ranked[0].selectionScore).toBeGreaterThan(ranked[2].selectionScore);
+  });
+});
+
+describe("buildSunoCatalog", () => {
+  it("selects one candidate per theme and preserves provenance in the generated catalog", () => {
+    const batch: SunoBatch = {
+      model: "v5.5",
+      planAtGeneration: "Pro Plan",
+      themes: [
+        {
+          index: 1,
+          name: "Quiet Victory",
+          description: "Quiet satisfaction after completing something difficult",
+          instrumental: true,
+          generatedAt: "2026-07-17T15:44:06+09:00",
+          prompt: "Warm calm uplifting downtempo instrumental, discovering a hopeful hook.",
+          candidates: [
+            { id: "weaker", title: "Small Win", sourceUrl: "https://suno.com/song/weaker" },
+            { id: "winner", title: "Small Win", sourceUrl: "https://suno.com/song/winner" },
+          ],
+        },
+      ],
+    };
+    const analysis: AudioAnalysis = {
+      durationMs: 90_000,
+      sampleRate: 8_000,
+      meanRmsDb: -16,
+      peakDb: -1,
+      clippingRatio: 0,
+      silenceRatio: 0,
+      leadingSilenceMs: 0,
+      hookStartMs: 30_000,
+      excerptEndMs: 42_000,
+      hookConfidence: 0.9,
+      structuralLiftDb: 9,
+    };
+
+    const result = buildSunoCatalog(batch, [
+      { id: "weaker", analysis: { ...analysis, hookConfidence: 0.2 } },
+      { id: "winner", analysis },
+    ], {
+      assetDirectory: "assets",
+      rightsEvidencePath: "data/suno-generation-2026-07-17.md",
+    });
+
+    expect(result.catalog).toEqual([
+      expect.objectContaining({
+        id: "quiet-victory",
+        title: "Small Win",
+        displayArtist: "CrowdFM Original",
+        audioPath: "assets/winner.mp3",
+        durationMs: 90_000,
+        excerptStartMs: 0,
+        excerptEndMs: 42_000,
+        tags: expect.arrayContaining(["instrumental", "downtempo"]),
+        mood: expect.arrayContaining(["calm", "hopeful", "uplifting", "warm"]),
+        provenance: {
+          provider: "SUNO",
+          songId: "winner",
+          sourceUrl: "https://suno.com/song/winner",
+          generatedAt: "2026-07-17T15:44:06+09:00",
+          generationPrompt: "Warm calm uplifting downtempo instrumental, discovering a hopeful hook.",
+          model: "v5.5",
+          planAtGeneration: "Pro Plan",
+          rightsEvidencePath: "data/suno-generation-2026-07-17.md",
+        },
+      }),
+    ]);
+    expect(result.catalog[0].tags).not.toContain("disco");
+    expect(result.report.themes[0]).toEqual(
+      expect.objectContaining({
+        theme: "Quiet Victory",
+        selectedSongId: "winner",
+      }),
+    );
+    expect(result.report.themes[0].candidates.map((candidate) => candidate.songId)).toEqual([
+      "winner",
+      "weaker",
+    ]);
   });
 });

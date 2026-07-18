@@ -43,6 +43,47 @@ export interface RankedCandidate extends CandidateAnalysis {
   selectionScore: number;
 }
 
+export interface SunoCatalogTrack {
+  id: string;
+  title: string;
+  displayArtist: string;
+  audioPath: string;
+  durationMs: number;
+  excerptStartMs: 0;
+  excerptEndMs: number;
+  tags: string[];
+  mood: string[];
+  hasVocals: boolean;
+  editorialNotes: string[];
+  provenance: {
+    provider: "SUNO";
+    songId: string;
+    sourceUrl: string;
+    generatedAt: string;
+    generationPrompt: string;
+    model: string;
+    planAtGeneration: string;
+    rightsEvidencePath: string;
+  };
+  verifiedFacts: Array<{ text: string; sourceUrl: string }>;
+}
+
+export interface SunoImportReport {
+  algorithmVersion: "1";
+  themes: Array<{
+    theme: string;
+    selectedSongId: string;
+    excerptEndMs: number;
+    candidates: Array<{
+      songId: string;
+      title: string;
+      selected: boolean;
+      selectionScore: number;
+      analysis: AudioAnalysis;
+    }>;
+  }>;
+}
+
 function requiredLine(markdown: string, label: string): string {
   const match = markdown.match(new RegExp(`^- ${label}: (.+)$`, "m"));
   if (!match) throw new Error(`Missing ${label} in Suno generation record`);
@@ -144,15 +185,18 @@ export function analyzePcm16le(pcm: Buffer, sampleRate: number): AudioAnalysis {
 
   const silenceThresholdDb = -45;
   const leadingSilentWindows = windowRmsDb.findIndex((value) => value >= silenceThresholdDb);
-  const searchEnd = Math.min(60, windowRmsDb.length - 6);
+  const searchEnd = Math.min(50, windowRmsDb.length - 6);
   let hookWindow = Math.min(35, Math.max(0, windowRmsDb.length - 1));
   let strongestLiftDb = 0;
+  let bestHookScore = 0;
 
   for (let index = 15; index <= searchEnd; index += 1) {
     const before = mean(windowRmsDb.slice(Math.max(0, index - 6), index));
     const after = mean(windowRmsDb.slice(index, index + 6));
     const liftDb = after - before;
-    if (liftDb > strongestLiftDb) {
+    const hookScore = liftDb - Math.max(0, index - 35) * 0.5;
+    if (hookScore > bestHookScore) {
+      bestHookScore = hookScore;
       strongestLiftDb = liftDb;
       hookWindow = index;
     }
@@ -206,4 +250,124 @@ export function rankCandidates(candidates: CandidateAnalysis[]): RankedCandidate
       (left, right) =>
         right.selectionScore - left.selectionScore || left.id.localeCompare(right.id),
     );
+}
+
+const MOOD_TERMS = [
+  "bittersweet",
+  "calm",
+  "comforting",
+  "determined",
+  "energetic",
+  "focused",
+  "grateful",
+  "hopeful",
+  "joyful",
+  "melancholic",
+  "nostalgic",
+  "reflective",
+  "soulful",
+  "uplifting",
+  "warm",
+];
+
+const GENRE_TERMS = [
+  "acoustic",
+  "alternative-pop",
+  "ambient",
+  "chamber",
+  "disco",
+  "downtempo",
+  "electronic-rock",
+  "folk-pop",
+  "funk-pop",
+  "jazzhop",
+  "lo-fi",
+  "neo-soul",
+  "r&b",
+  "synthwave",
+];
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function termsIn(text: string, terms: string[]): string[] {
+  const normalized = text.toLowerCase().replace(/[–—]/g, "-");
+  return terms.filter((term) => {
+    const pattern = term
+      .split("-")
+      .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("[\\s-]+");
+    return new RegExp(`(^|[^a-z0-9])${pattern}(?=$|[^a-z0-9])`).test(normalized);
+  });
+}
+
+export function buildSunoCatalog(
+  batch: SunoBatch,
+  analyses: CandidateAnalysis[],
+  options: { assetDirectory: string; rightsEvidencePath: string },
+): { catalog: SunoCatalogTrack[]; report: SunoImportReport } {
+  const analysisById = new Map(analyses.map((candidate) => [candidate.id, candidate.analysis]));
+  const catalog: SunoCatalogTrack[] = [];
+  const report: SunoImportReport = { algorithmVersion: "1", themes: [] };
+
+  for (const theme of batch.themes) {
+    const ranked = rankCandidates(
+      theme.candidates.map((candidate) => {
+        const analysis = analysisById.get(candidate.id);
+        if (!analysis) throw new Error(`Missing audio analysis for ${candidate.id}`);
+        return { id: candidate.id, analysis };
+      }),
+    );
+    const selected = ranked[0];
+    const candidate = theme.candidates.find((item) => item.id === selected.id);
+    if (!candidate) throw new Error(`Missing candidate metadata for ${selected.id}`);
+    const descriptorText = `${theme.name} ${theme.description} ${theme.prompt}`;
+
+    catalog.push({
+      id: slugify(theme.name),
+      title: candidate.title,
+      displayArtist: "CrowdFM Original",
+      audioPath: `${options.assetDirectory}/${candidate.id}.mp3`,
+      durationMs: selected.analysis.durationMs,
+      excerptStartMs: 0,
+      excerptEndMs: selected.analysis.excerptEndMs,
+      tags: [theme.instrumental ? "instrumental" : "vocal", ...termsIn(descriptorText, GENRE_TERMS)],
+      mood: termsIn(descriptorText, MOOD_TERMS),
+      hasVocals: !theme.instrumental,
+      editorialNotes: [
+        theme.description,
+        `Automatically selected from ${ranked.length} candidates with score ${selected.selectionScore}.`,
+      ],
+      provenance: {
+        provider: "SUNO",
+        songId: candidate.id,
+        sourceUrl: candidate.sourceUrl,
+        generatedAt: theme.generatedAt,
+        generationPrompt: theme.prompt,
+        model: batch.model,
+        planAtGeneration: batch.planAtGeneration,
+        rightsEvidencePath: options.rightsEvidencePath,
+      },
+      verifiedFacts: [],
+    });
+    report.themes.push({
+      theme: theme.name,
+      selectedSongId: candidate.id,
+      excerptEndMs: selected.analysis.excerptEndMs,
+      candidates: ranked.map((item) => ({
+        songId: item.id,
+        title: theme.candidates.find((candidateItem) => candidateItem.id === item.id)?.title ?? item.id,
+        selected: item.id === selected.id,
+        selectionScore: item.selectionScore,
+        analysis: item.analysis,
+      })),
+    });
+  }
+
+  return { catalog, report };
 }
