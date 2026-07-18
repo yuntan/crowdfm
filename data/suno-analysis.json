@@ -1,0 +1,620 @@
+{
+  "algorithmVersion": "1",
+  "generatedAt": "2026-07-18T03:37:02.209Z",
+  "recordPath": "data/suno-generation-2026-07-17.md",
+  "assetDirectory": "assets",
+  "sourceDetails": {
+    "9b6c8d86-0dce-439b-a38b-662acb207372": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 196803,
+      "durationMs": 83760,
+      "sizeBytes": 2061270
+    },
+    "58e0cf9b-c386-486b-9690-73032461604e": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 191821,
+      "durationMs": 87800,
+      "sizeBytes": 2106360
+    },
+    "cf45946c-e076-4485-9251-67fceaffb3ff": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 179788,
+      "durationMs": 168040,
+      "sizeBytes": 3777318
+    },
+    "c2fdbec1-5a97-40c5-a951-559002856f63": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 181619,
+      "durationMs": 159560,
+      "sizeBytes": 3623454
+    },
+    "740aae4b-4689-46d2-8585-dd91341894f0": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 185694,
+      "durationMs": 65120,
+      "sizeBytes": 1512648
+    },
+    "2addf544-d4fd-4f32-939f-e3fe427799b2": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 182912,
+      "durationMs": 81680,
+      "sizeBytes": 1868616
+    },
+    "519c119d-c065-4c21-ba80-45f80c20364d": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 183973,
+      "durationMs": 200200,
+      "sizeBytes": 4604832
+    },
+    "78e25b31-9bb6-47dd-aa8d-156e86055d8a": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 179424,
+      "durationMs": 206320,
+      "sizeBytes": 4628232
+    },
+    "19149b9a-b6ad-4a5b-8bf7-1dc7aa5ed023": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 189449,
+      "durationMs": 133840,
+      "sizeBytes": 3170400
+    },
+    "2c2e6b1d-876d-4f6a-b5aa-cd2436ee2985": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 182142,
+      "durationMs": 103440,
+      "sizeBytes": 2355798
+    },
+    "059cb76a-2358-4b2d-93d3-488e608c4409": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 190475,
+      "durationMs": 129400,
+      "sizeBytes": 3081864
+    },
+    "ee75b680-f816-4d46-8eae-f090d1673ba6": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 192576,
+      "durationMs": 154640,
+      "sizeBytes": 3723624
+    },
+    "189163c9-9f2e-446d-95b5-192b50012f26": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 179211,
+      "durationMs": 120520,
+      "sizeBytes": 2700696
+    },
+    "45e5483e-f3c7-45e1-a76f-a5cccb51d5f6": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 183596,
+      "durationMs": 128200,
+      "sizeBytes": 2943024
+    },
+    "c255e832-7c41-461c-827c-89b6b8fc67dc": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 178477,
+      "durationMs": 254161,
+      "sizeBytes": 5671464
+    },
+    "ac3d2689-496d-4f96-8fa0-288485026440": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 182506,
+      "durationMs": 242320,
+      "sizeBytes": 5529000
+    },
+    "dd55f196-c395-4650-8179-781bf0f71176": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 189309,
+      "durationMs": 209320,
+      "sizeBytes": 4954200
+    },
+    "b9b17b23-7c47-427d-a2dd-9063586146f9": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 183610,
+      "durationMs": 159520,
+      "sizeBytes": 3662088
+    },
+    "96a5014e-33fa-4563-8052-f862d1f22869": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 180783,
+      "durationMs": 228880,
+      "sizeBytes": 5173086
+    },
+    "1860a6da-1467-43ef-9fc8-b89dc1b602d2": {
+      "codecName": "mp3",
+      "sampleRate": 48000,
+      "channels": 2,
+      "bitRate": 181170,
+      "durationMs": 228160,
+      "sizeBytes": 5167830
+    }
+  },
+  "themes": [
+    {
+      "theme": "Quiet Victory",
+      "selectedSongId": "58e0cf9b-c386-486b-9690-73032461604e",
+      "excerptEndMs": 30000,
+      "candidates": [
+        {
+          "songId": "58e0cf9b-c386-486b-9690-73032461604e",
+          "title": "Small Win Tonight",
+          "selected": true,
+          "selectionScore": 51.452,
+          "analysis": {
+            "durationMs": 87800,
+            "sampleRate": 8000,
+            "meanRmsDb": -15.688,
+            "peakDb": -0.861,
+            "clippingRatio": 0,
+            "silenceRatio": 0.022727,
+            "leadingSilenceMs": 1000,
+            "hookStartMs": 15000,
+            "excerptEndMs": 30000,
+            "hookConfidence": 0.49,
+            "structuralLiftDb": 6.896
+          }
+        },
+        {
+          "songId": "9b6c8d86-0dce-439b-a38b-662acb207372",
+          "title": "Small Win Tonight",
+          "selected": false,
+          "selectionScore": 41.534,
+          "analysis": {
+            "durationMs": 83760,
+            "sampleRate": 8000,
+            "meanRmsDb": -16.18,
+            "peakDb": -0.032,
+            "clippingRatio": 0,
+            "silenceRatio": 0.035714,
+            "leadingSilenceMs": 1000,
+            "hookStartMs": 27000,
+            "excerptEndMs": 39000,
+            "hookConfidence": 0.3,
+            "structuralLiftDb": 4.996
+          }
+        }
+      ]
+    },
+    {
+      "theme": "First Light",
+      "selectedSongId": "c2fdbec1-5a97-40c5-a951-559002856f63",
+      "excerptEndMs": 41000,
+      "candidates": [
+        {
+          "songId": "c2fdbec1-5a97-40c5-a951-559002856f63",
+          "title": "Porchlight on the Map",
+          "selected": true,
+          "selectionScore": 38.71,
+          "analysis": {
+            "durationMs": 159560,
+            "sampleRate": 8000,
+            "meanRmsDb": -17.532,
+            "peakDb": -3.301,
+            "clippingRatio": 0,
+            "silenceRatio": 0.01875,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 29000,
+            "excerptEndMs": 41000,
+            "hookConfidence": 0.153,
+            "structuralLiftDb": 3.527
+          }
+        },
+        {
+          "songId": "cf45946c-e076-4485-9251-67fceaffb3ff",
+          "title": "Porchlight on the Map",
+          "selected": false,
+          "selectionScore": 36.473,
+          "analysis": {
+            "durationMs": 168040,
+            "sampleRate": 8000,
+            "meanRmsDb": -17.459,
+            "peakDb": -3.371,
+            "clippingRatio": 0,
+            "silenceRatio": 0.017751,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 28000,
+            "excerptEndMs": 40000,
+            "hookConfidence": 0.122,
+            "structuralLiftDb": 3.223
+          }
+        }
+      ]
+    },
+    {
+      "theme": "After Hours Focus",
+      "selectedSongId": "2addf544-d4fd-4f32-939f-e3fe427799b2",
+      "excerptEndMs": 41000,
+      "candidates": [
+        {
+          "songId": "2addf544-d4fd-4f32-939f-e3fe427799b2",
+          "title": "Midnight Compiler",
+          "selected": true,
+          "selectionScore": 52.585,
+          "analysis": {
+            "durationMs": 81680,
+            "sampleRate": 8000,
+            "meanRmsDb": -15.345,
+            "peakDb": -2.502,
+            "clippingRatio": 0,
+            "silenceRatio": 0,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 29000,
+            "excerptEndMs": 41000,
+            "hookConfidence": 0.354,
+            "structuralLiftDb": 5.536
+          }
+        },
+        {
+          "songId": "740aae4b-4689-46d2-8585-dd91341894f0",
+          "title": "Midnight Compiler",
+          "selected": false,
+          "selectionScore": 24.205,
+          "analysis": {
+            "durationMs": 65120,
+            "sampleRate": 8000,
+            "meanRmsDb": -15.205,
+            "peakDb": -1.788,
+            "clippingRatio": 0,
+            "silenceRatio": 0,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 15000,
+            "excerptEndMs": 30000,
+            "hookConfidence": 0,
+            "structuralLiftDb": 1.733
+          }
+        }
+      ]
+    },
+    {
+      "theme": "Exhale",
+      "selectedSongId": "519c119d-c065-4c21-ba80-45f80c20364d",
+      "excerptEndMs": 38000,
+      "candidates": [
+        {
+          "songId": "519c119d-c065-4c21-ba80-45f80c20364d",
+          "title": "Finally Exhaling",
+          "selected": true,
+          "selectionScore": 27.635,
+          "analysis": {
+            "durationMs": 200200,
+            "sampleRate": 8000,
+            "meanRmsDb": -16.619,
+            "peakDb": -3.569,
+            "clippingRatio": 0,
+            "silenceRatio": 0.014925,
+            "leadingSilenceMs": 1000,
+            "hookStartMs": 26000,
+            "excerptEndMs": 38000,
+            "hookConfidence": 0,
+            "structuralLiftDb": 1.942
+          }
+        },
+        {
+          "songId": "78e25b31-9bb6-47dd-aa8d-156e86055d8a",
+          "title": "Finally Exhaling",
+          "selected": false,
+          "selectionScore": 27.136,
+          "analysis": {
+            "durationMs": 206320,
+            "sampleRate": 8000,
+            "meanRmsDb": -16.122,
+            "peakDb": -2.387,
+            "clippingRatio": 0,
+            "silenceRatio": 0.004831,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 20000,
+            "excerptEndMs": 32000,
+            "hookConfidence": 0,
+            "structuralLiftDb": 1.796
+          }
+        }
+      ]
+    },
+    {
+      "theme": "Rain on the Window",
+      "selectedSongId": "2c2e6b1d-876d-4f6a-b5aa-cd2436ee2985",
+      "excerptEndMs": 30000,
+      "candidates": [
+        {
+          "songId": "2c2e6b1d-876d-4f6a-b5aa-cd2436ee2985",
+          "title": "Rain on Oak Glass",
+          "selected": true,
+          "selectionScore": 68.486,
+          "analysis": {
+            "durationMs": 103440,
+            "sampleRate": 8000,
+            "meanRmsDb": -17.012,
+            "peakDb": -0.814,
+            "clippingRatio": 0,
+            "silenceRatio": 0.019231,
+            "leadingSilenceMs": 1000,
+            "hookStartMs": 17000,
+            "excerptEndMs": 30000,
+            "hookConfidence": 0.766,
+            "structuralLiftDb": 9.659
+          }
+        },
+        {
+          "songId": "19149b9a-b6ad-4a5b-8bf7-1dc7aa5ed023",
+          "title": "Rain on Oak Glass",
+          "selected": false,
+          "selectionScore": 44.92,
+          "analysis": {
+            "durationMs": 133840,
+            "sampleRate": 8000,
+            "meanRmsDb": -16.174,
+            "peakDb": -0.944,
+            "clippingRatio": 0,
+            "silenceRatio": 0.014925,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 28000,
+            "excerptEndMs": 40000,
+            "hookConfidence": 0.239,
+            "structuralLiftDb": 4.388
+          }
+        }
+      ]
+    },
+    {
+      "theme": "Neon Miles",
+      "selectedSongId": "059cb76a-2358-4b2d-93d3-488e608c4409",
+      "excerptEndMs": 35000,
+      "candidates": [
+        {
+          "songId": "059cb76a-2358-4b2d-93d3-488e608c4409",
+          "title": "Midnight Overpass",
+          "selected": true,
+          "selectionScore": 35.6,
+          "analysis": {
+            "durationMs": 129400,
+            "sampleRate": 8000,
+            "meanRmsDb": -16.251,
+            "peakDb": -4.083,
+            "clippingRatio": 0,
+            "silenceRatio": 0.015385,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 23000,
+            "excerptEndMs": 35000,
+            "hookConfidence": 0.127,
+            "structuralLiftDb": 3.266
+          }
+        },
+        {
+          "songId": "ee75b680-f816-4d46-8eae-f090d1673ba6",
+          "title": "Midnight Overpass",
+          "selected": false,
+          "selectionScore": 33.339,
+          "analysis": {
+            "durationMs": 154640,
+            "sampleRate": 8000,
+            "meanRmsDb": -15.167,
+            "peakDb": -3.308,
+            "clippingRatio": 0,
+            "silenceRatio": 0.019355,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 21000,
+            "excerptEndMs": 33000,
+            "hookConfidence": 0.119,
+            "structuralLiftDb": 3.186
+          }
+        }
+      ]
+    },
+    {
+      "theme": "Same Room Again",
+      "selectedSongId": "45e5483e-f3c7-45e1-a76f-a5cccb51d5f6",
+      "excerptEndMs": 48000,
+      "candidates": [
+        {
+          "songId": "45e5483e-f3c7-45e1-a76f-a5cccb51d5f6",
+          "title": "Bus Stop Laugh",
+          "selected": true,
+          "selectionScore": 51.663,
+          "analysis": {
+            "durationMs": 128200,
+            "sampleRate": 8000,
+            "meanRmsDb": -15.731,
+            "peakDb": -2.033,
+            "clippingRatio": 0,
+            "silenceRatio": 0.007752,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 36000,
+            "excerptEndMs": 48000,
+            "hookConfidence": 0.297,
+            "structuralLiftDb": 4.968
+          }
+        },
+        {
+          "songId": "189163c9-9f2e-446d-95b5-192b50012f26",
+          "title": "Bus Stop Laugh",
+          "selected": false,
+          "selectionScore": 44.578,
+          "analysis": {
+            "durationMs": 120520,
+            "sampleRate": 8000,
+            "meanRmsDb": -15.438,
+            "peakDb": -1.469,
+            "clippingRatio": 0,
+            "silenceRatio": 0,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 35000,
+            "excerptEndMs": 47000,
+            "hookConfidence": 0.169,
+            "structuralLiftDb": 3.692
+          }
+        }
+      ]
+    },
+    {
+      "theme": "Step Into It",
+      "selectedSongId": "ac3d2689-496d-4f96-8fa0-288485026440",
+      "excerptEndMs": 30000,
+      "candidates": [
+        {
+          "songId": "ac3d2689-496d-4f96-8fa0-288485026440",
+          "title": "Count The Seconds",
+          "selected": true,
+          "selectionScore": 42.877,
+          "analysis": {
+            "durationMs": 242320,
+            "sampleRate": 8000,
+            "meanRmsDb": -15.503,
+            "peakDb": -3.024,
+            "clippingRatio": 0,
+            "silenceRatio": 0.004115,
+            "leadingSilenceMs": 1000,
+            "hookStartMs": 17000,
+            "excerptEndMs": 30000,
+            "hookConfidence": 0.318,
+            "structuralLiftDb": 5.178
+          }
+        },
+        {
+          "songId": "c255e832-7c41-461c-827c-89b6b8fc67dc",
+          "title": "Count The Seconds",
+          "selected": false,
+          "selectionScore": 29.739,
+          "analysis": {
+            "durationMs": 254161,
+            "sampleRate": 8000,
+            "meanRmsDb": -16.345,
+            "peakDb": -4.521,
+            "clippingRatio": 0,
+            "silenceRatio": 0.003922,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 15000,
+            "excerptEndMs": 30000,
+            "hookConfidence": 0.088,
+            "structuralLiftDb": 2.884
+          }
+        }
+      ]
+    },
+    {
+      "theme": "Open Saturday",
+      "selectedSongId": "dd55f196-c395-4650-8179-781bf0f71176",
+      "excerptEndMs": 45000,
+      "candidates": [
+        {
+          "songId": "dd55f196-c395-4650-8179-781bf0f71176",
+          "title": "Wide Open Wonder",
+          "selected": true,
+          "selectionScore": 32.985,
+          "analysis": {
+            "durationMs": 209320,
+            "sampleRate": 8000,
+            "meanRmsDb": -16.777,
+            "peakDb": -3.094,
+            "clippingRatio": 0,
+            "silenceRatio": 0.004762,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 33000,
+            "excerptEndMs": 45000,
+            "hookConfidence": 0,
+            "structuralLiftDb": 1.594
+          }
+        },
+        {
+          "songId": "b9b17b23-7c47-427d-a2dd-9063586146f9",
+          "title": "Saturday Drift",
+          "selected": false,
+          "selectionScore": 31.022,
+          "analysis": {
+            "durationMs": 159520,
+            "sampleRate": 8000,
+            "meanRmsDb": -16.978,
+            "peakDb": -2.904,
+            "clippingRatio": 0,
+            "silenceRatio": 0,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 29000,
+            "excerptEndMs": 41000,
+            "hookConfidence": 0,
+            "structuralLiftDb": 0.598
+          }
+        }
+      ]
+    },
+    {
+      "theme": "Carry the Good Parts",
+      "selectedSongId": "96a5014e-33fa-4563-8052-f862d1f22869",
+      "excerptEndMs": 30000,
+      "candidates": [
+        {
+          "songId": "96a5014e-33fa-4563-8052-f862d1f22869",
+          "title": "The Green Room Key",
+          "selected": true,
+          "selectionScore": 45.343,
+          "analysis": {
+            "durationMs": 228880,
+            "sampleRate": 8000,
+            "meanRmsDb": -16.382,
+            "peakDb": -1.671,
+            "clippingRatio": 0,
+            "silenceRatio": 0.0131,
+            "leadingSilenceMs": 0,
+            "hookStartMs": 16000,
+            "excerptEndMs": 30000,
+            "hookConfidence": 0.348,
+            "structuralLiftDb": 5.484
+          }
+        },
+        {
+          "songId": "1860a6da-1467-43ef-9fc8-b89dc1b602d2",
+          "title": "The Green Room Key",
+          "selected": false,
+          "selectionScore": 30.268,
+          "analysis": {
+            "durationMs": 228160,
+            "sampleRate": 8000,
+            "meanRmsDb": -17.179,
+            "peakDb": -2.406,
+            "clippingRatio": 0,
+            "silenceRatio": 0.017467,
+            "leadingSilenceMs": 1000,
+            "hookStartMs": 27000,
+            "excerptEndMs": 39000,
+            "hookConfidence": 0.047,
+            "structuralLiftDb": 2.47
+          }
+        }
+      ]
+    }
+  ]
+}

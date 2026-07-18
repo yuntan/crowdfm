@@ -1,32 +1,21 @@
 # Curated track catalog
 
-`tracks.json` stays empty until the demo tracks are chosen. Real OpenAI mode refuses to run with an empty or invalid catalog; mock mode remains fully usable.
+`tracks.json` is the legacy YouTube catalog consumed by the current application. It stays empty while the application is migrated to the generated-audio contract; mock mode remains usable.
 
-Add 5–10 manually verified entries in this shape:
+The Suno preparation workflow uses:
 
-```json
-[
-  {
-    "id": "stable-editorial-id",
-    "youtubeVideoId": "verifiedVideoId",
-    "title": "Track title",
-    "artist": "Artist",
-    "durationMs": 180000,
-    "startSeconds": 0,
-    "endSeconds": 42.5,
-    "tags": ["uplifting"],
-    "mood": ["warm"],
-    "hasVocals": true,
-    "licenseUrl": "https://license-source.example/record",
-    "sourceUrl": "https://www.youtube.com/watch?v=verifiedVideoId"
-  }
-]
+- `suno-generation-2026-07-17.md`: prompts, source URLs, model, and generation-time plan.
+- `../assets/<Suno song ID>.mp3`: the 20 local candidate masters.
+- `suno-analysis.json`: reproducible measurements and ranked A/B results.
+- `suno-tracks.json`: one automatically selected track per theme in the next catalog schema.
+- `../generated/audio/suno-previews/`: ignored beginning-to-hook review excerpts.
+
+Regenerate all derived files with:
+
+```bash
+pnpm import:suno
 ```
 
-Before recording the demo, verify each entry locally:
+The importer verifies each MP3 with ffprobe, decodes a low-resolution mono analysis stream with FFmpeg, measures silence, peak, RMS, clipping, and structural lift, ranks each A/B pair, infers `excerptEndMs`, and creates previews. It never modifies the source MP3s or calls an external API.
 
-- Embedding is allowed and playback works in the demo region.
-- `durationMs` matches the source.
-- `startSeconds` is `0`.
-- `endSeconds` is after the start and at or just after the first chorus begins.
-- Source and license URLs are accurate and reviewable.
+Automatic structure detection is heuristic. Before the final submission recording, listen to the ten generated previews and override a selected song or boundary if lyrics, pronunciation, or musical structure are unsuitable. Keep generation-time rights evidence with the batch record.

@@ -1,0 +1,341 @@
+[
+  {
+    "id": "quiet-victory",
+    "title": "Small Win Tonight",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/58e0cf9b-c386-486b-9690-73032461604e.mp3",
+    "durationMs": 87800,
+    "excerptStartMs": 0,
+    "excerptEndMs": 30000,
+    "tags": [
+      "instrumental",
+      "downtempo"
+    ],
+    "mood": [
+      "calm",
+      "hopeful",
+      "reflective",
+      "uplifting",
+      "warm"
+    ],
+    "hasVocals": false,
+    "editorialNotes": [
+      "Quiet satisfaction after completing something difficult",
+      "Automatically selected from 2 candidates with score 51.452."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "58e0cf9b-c386-486b-9690-73032461604e",
+      "sourceUrl": "https://suno.com/song/58e0cf9b-c386-486b-9690-73032461604e",
+      "generatedAt": "2026-07-17T15:44:06+09:00",
+      "generationPrompt": "Warm downtempo indie-electronic instrumental at 82 BPM for a quiet private victory after a difficult week. Intimate felt piano, soft analog synth pads, muted electric guitar, rounded bass, and restrained brushed drums. Begin sparse and reflective, then reveal a memorable hopeful melodic hook within 35 seconds. Calm, warm, polished, emotionally uplifting without becoming triumphant or loud. No vocals, no spoken words, no dramatic trailer-style climax.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  },
+  {
+    "id": "first-light",
+    "title": "Porchlight on the Map",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/c2fdbec1-5a97-40c5-a951-559002856f63.mp3",
+    "durationMs": 159560,
+    "excerptStartMs": 0,
+    "excerptEndMs": 41000,
+    "tags": [
+      "vocal",
+      "acoustic",
+      "folk-pop"
+    ],
+    "mood": [
+      "hopeful",
+      "warm"
+    ],
+    "hasVocals": true,
+    "editorialNotes": [
+      "A hopeful new beginning",
+      "Automatically selected from 2 candidates with score 38.71."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "c2fdbec1-5a97-40c5-a951-559002856f63",
+      "sourceUrl": "https://suno.com/song/c2fdbec1-5a97-40c5-a951-559002856f63",
+      "generatedAt": "2026-07-17T15:44:06+09:00",
+      "generationPrompt": "Hopeful English folk-pop at 104 BPM about taking a first step into a new chapter after uncertainty. Warm acoustic guitar, light piano, subtle hand percussion, melodic bass, and airy harmonies. Intimate conversational verses lead to a clear, singable chorus within 40 seconds. The lyrics should feel specific and sincere, using images of morning light and an open road without sounding motivational or clichéd. Bright, human, gently energizing, polished radio mix.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  },
+  {
+    "id": "after-hours-focus",
+    "title": "Midnight Compiler",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/2addf544-d4fd-4f32-939f-e3fe427799b2.mp3",
+    "durationMs": 81680,
+    "excerptStartMs": 0,
+    "excerptEndMs": 41000,
+    "tags": [
+      "instrumental",
+      "jazzhop",
+      "lo-fi"
+    ],
+    "mood": [
+      "focused",
+      "warm"
+    ],
+    "hasVocals": false,
+    "editorialNotes": [
+      "Deep concentration late at night",
+      "Automatically selected from 2 candidates with score 52.585."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "2addf544-d4fd-4f32-939f-e3fe427799b2",
+      "sourceUrl": "https://suno.com/song/2addf544-d4fd-4f32-939f-e3fe427799b2",
+      "generatedAt": "2026-07-17T15:44:06+09:00",
+      "generationPrompt": "Late-night lo-fi jazzhop instrumental at 74 BPM for focused study and coding. Dusty drums, warm Rhodes chords, upright bass, soft vibraphone accents, and a restrained clean-guitar motif. Establish a memorable repeating hook within 30 seconds, then develop it through subtle harmonic changes. Cozy, steady, thoughtful, slightly nocturnal, with gentle tape texture but a clean enough mix for radio. No vocals, no speech, no distracting solos.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  },
+  {
+    "id": "exhale",
+    "title": "Finally Exhaling",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/519c119d-c065-4c21-ba80-45f80c20364d.mp3",
+    "durationMs": 200200,
+    "excerptStartMs": 0,
+    "excerptEndMs": 38000,
+    "tags": [
+      "vocal",
+      "alternative-pop",
+      "electronic-rock"
+    ],
+    "mood": [
+      "energetic"
+    ],
+    "hasVocals": true,
+    "editorialNotes": [
+      "Release after sustained pressure",
+      "Automatically selected from 2 candidates with score 27.635."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "519c119d-c065-4c21-ba80-45f80c20364d",
+      "sourceUrl": "https://suno.com/song/519c119d-c065-4c21-ba80-45f80c20364d",
+      "generatedAt": "2026-07-17T15:44:06+09:00",
+      "generationPrompt": "English alternative pop with electronic-rock lift at 118 BPM, about finally exhaling after a tense week and allowing yourself to feel proud. Start with close, restrained vocals over pulsing synth and muted guitar; build naturally into an open, cathartic chorus within 40 seconds with live drums, wide guitars, and luminous synth layers. The emotion is relief rather than rebellion. Honest, modern, energetic, memorable, and suitable for a radio show without aggressive distortion.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  },
+  {
+    "id": "rain-on-the-window",
+    "title": "Rain on Oak Glass",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/2c2e6b1d-876d-4f6a-b5aa-cd2436ee2985.mp3",
+    "durationMs": 103440,
+    "excerptStartMs": 0,
+    "excerptEndMs": 30000,
+    "tags": [
+      "instrumental",
+      "ambient",
+      "chamber"
+    ],
+    "mood": [
+      "comforting",
+      "melancholic",
+      "reflective"
+    ],
+    "hasVocals": false,
+    "editorialNotes": [
+      "Solitude and gentle reflection on a rainy day",
+      "Automatically selected from 2 candidates with score 68.486."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "2c2e6b1d-876d-4f6a-b5aa-cd2436ee2985",
+      "sourceUrl": "https://suno.com/song/2c2e6b1d-876d-4f6a-b5aa-cd2436ee2985",
+      "generatedAt": "2026-07-17T15:44:06+09:00",
+      "generationPrompt": "Reflective ambient chamber instrumental at 68 BPM for watching rain alone and sorting through complicated feelings. Felt piano carries a simple motif, joined by soft cello, distant electric-piano tones, and nearly weightless brushed percussion. Introduce a gentle recognizable refrain within 35 seconds. Melancholic but comforting, spacious, intimate, organic, and quietly beautiful. No vocals, no spoken words, no thunder sound effects, no huge cinematic swell.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  },
+  {
+    "id": "neon-miles",
+    "title": "Midnight Overpass",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/059cb76a-2358-4b2d-93d3-488e608c4409.mp3",
+    "durationMs": 129400,
+    "excerptStartMs": 0,
+    "excerptEndMs": 35000,
+    "tags": [
+      "instrumental",
+      "synthwave"
+    ],
+    "mood": [
+      "warm"
+    ],
+    "hasVocals": false,
+    "editorialNotes": [
+      "A solitary drive through the city at night",
+      "Automatically selected from 2 candidates with score 35.6."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "059cb76a-2358-4b2d-93d3-488e608c4409",
+      "sourceUrl": "https://suno.com/song/059cb76a-2358-4b2d-93d3-488e608c4409",
+      "generatedAt": "2026-07-17T15:44:06+09:00",
+      "generationPrompt": "Cinematic synthwave instrumental at 105 BPM for a solitary night drive through a glowing city. Steady analog bass pulse, crisp restrained drums, glassy arpeggios, warm synth pads, and a strong melodic lead hook arriving within 35 seconds. Sleek and forward-moving with a hint of nostalgia, but not dark, ominous, or bombastic. Polished wide mix, smooth transitions, no vocals, no spoken samples, no retro parody.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  },
+  {
+    "id": "same-room-again",
+    "title": "Bus Stop Laugh",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/45e5483e-f3c7-45e1-a76f-a5cccb51d5f6.mp3",
+    "durationMs": 128200,
+    "excerptStartMs": 0,
+    "excerptEndMs": 48000,
+    "tags": [
+      "vocal",
+      "neo-soul",
+      "r&b"
+    ],
+    "mood": [
+      "soulful",
+      "warm"
+    ],
+    "hasVocals": true,
+    "editorialNotes": [
+      "Reconnecting with someone important",
+      "Automatically selected from 2 candidates with score 51.663."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "45e5483e-f3c7-45e1-a76f-a5cccb51d5f6",
+      "sourceUrl": "https://suno.com/song/45e5483e-f3c7-45e1-a76f-a5cccb51d5f6",
+      "generatedAt": "2026-07-17T15:44:06+09:00",
+      "generationPrompt": "Warm English neo-soul and contemporary R&B at 92 BPM about meeting an old friend again and discovering that the connection survived the distance. Rhodes piano, clean guitar, deep melodic bass, pocket drums, subtle brass accents, and rich background harmonies. Relaxed conversational verse followed by a memorable affectionate chorus within 40 seconds. Mature gratitude, gentle humor, and warmth; avoid romance clichés and vocal showboating. Intimate, soulful, polished radio mix.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  },
+  {
+    "id": "step-into-it",
+    "title": "Count The Seconds",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/ac3d2689-496d-4f96-8fa0-288485026440.mp3",
+    "durationMs": 242320,
+    "excerptStartMs": 0,
+    "excerptEndMs": 30000,
+    "tags": [
+      "vocal",
+      "electronic-rock"
+    ],
+    "mood": [
+      "determined",
+      "focused"
+    ],
+    "hasVocals": true,
+    "editorialNotes": [
+      "Finding courage immediately before a difficult moment",
+      "Automatically selected from 2 candidates with score 42.877."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "ac3d2689-496d-4f96-8fa0-288485026440",
+      "sourceUrl": "https://suno.com/song/ac3d2689-496d-4f96-8fa0-288485026440",
+      "generatedAt": "2026-07-17T15:44:06+09:00",
+      "generationPrompt": "English cinematic electronic rock at 124 BPM about finding courage in the seconds before stepping into a difficult moment. Begin with a heartbeat-like electronic pulse, focused vocal, and minimal guitar; build into a powerful melodic chorus within 40 seconds with live drums, bright synths, and controlled distorted guitars. Determined rather than angry, vulnerable rather than heroic. Modern, propulsive, emotionally direct, with a clean radio-ready mix and no trailer-music bombast.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  },
+  {
+    "id": "open-saturday",
+    "title": "Wide Open Wonder",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/dd55f196-c395-4650-8179-781bf0f71176.mp3",
+    "durationMs": 209320,
+    "excerptStartMs": 0,
+    "excerptEndMs": 45000,
+    "tags": [
+      "vocal",
+      "disco",
+      "funk-pop"
+    ],
+    "mood": [
+      "joyful",
+      "warm"
+    ],
+    "hasVocals": true,
+    "editorialNotes": [
+      "A carefree weekend with nowhere to be",
+      "Automatically selected from 2 candidates with score 32.985."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "dd55f196-c395-4650-8179-781bf0f71176",
+      "sourceUrl": "https://suno.com/song/dd55f196-c395-4650-8179-781bf0f71176",
+      "generatedAt": "2026-07-17T15:44:06+09:00",
+      "generationPrompt": "Bright English funk-pop and modern disco at 116 BPM about waking up on a Saturday with no schedule and following the day wherever it goes. Tight live bass, clean rhythm guitar, sparkling electric piano, punchy drums, handclaps, and playful horn accents. Get to an irresistible compact chorus within 35 seconds. Breezy, witty, inclusive, and joyful without sounding childish or like a party commercial. Crisp, warm, danceable radio production.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  },
+  {
+    "id": "carry-the-good-parts",
+    "title": "The Green Room Key",
+    "displayArtist": "CrowdFM Original",
+    "audioPath": "assets/96a5014e-33fa-4563-8052-f862d1f22869.mp3",
+    "durationMs": 228880,
+    "excerptStartMs": 0,
+    "excerptEndMs": 30000,
+    "tags": [
+      "vocal",
+      "acoustic"
+    ],
+    "mood": [
+      "bittersweet",
+      "grateful",
+      "warm"
+    ],
+    "hasVocals": true,
+    "editorialNotes": [
+      "A bittersweet farewell shaped by gratitude",
+      "Automatically selected from 2 candidates with score 45.343."
+    ],
+    "provenance": {
+      "provider": "SUNO",
+      "songId": "96a5014e-33fa-4563-8052-f862d1f22869",
+      "sourceUrl": "https://suno.com/song/96a5014e-33fa-4563-8052-f862d1f22869",
+      "generatedAt": "2026-07-17T21:00:36+09:00",
+      "generationPrompt": "Intimate English acoustic indie ballad at 76 BPM about leaving a place or chapter behind while carrying its good memories forward. Fingerpicked acoustic guitar, close natural vocal, soft piano, upright bass, brushed drums, and restrained strings. Let the first chorus arrive within 45 seconds and widen gently without becoming oversized. Bittersweet, grateful, specific, and emotionally mature; avoid melodrama, breakup clichés, and overly ornate singing. Warm organic radio mix. Keep the opening concise so the emotional refrain arrives early.",
+      "model": "v5.5",
+      "planAtGeneration": "Pro Plan",
+      "rightsEvidencePath": "data/suno-generation-2026-07-17.md"
+    },
+    "verifiedFacts": []
+  }
+]
