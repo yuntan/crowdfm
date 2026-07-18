@@ -1,32 +1,44 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  DISPLAY_STAGE_COPY,
   READY_LEAD_TIME_MS,
   RequestSchema,
   TrackSchema,
   createProgramTimeline,
+  cueAtElapsedTime,
   scheduledStartAfterReady,
-  segmentAtElapsedTime,
   toDisplayStage,
+  type Track,
 } from "@/lib/domain";
 
-const track = {
-  id: "demo-track",
-  youtubeVideoId: "video12345",
-  title: "Demo Track",
-  artist: "Demo Artist",
-  durationMs: 180_000,
-  startSeconds: 0,
-  endSeconds: 42.5,
-  tags: ["hopeful"],
-  mood: ["warm"],
-  hasVocals: true,
-  licenseUrl: "https://example.com/license",
-  sourceUrl: "https://youtube.com/watch?v=video12345",
+export const generatedTrack: Track = {
+  id: "quiet-victory",
+  title: "Small Win Tonight",
+  displayArtist: "CrowdFM Original",
+  audioPath: "assets/58e0cf9b-c386-486b-9690-73032461604e.mp3",
+  durationMs: 87_800,
+  excerptStartMs: 0,
+  excerptEndMs: 30_000,
+  tags: ["instrumental", "downtempo"],
+  mood: ["calm", "hopeful", "warm"],
+  hasVocals: false,
+  editorialNotes: ["Quiet satisfaction after completing something difficult"],
+  provenance: {
+    provider: "SUNO",
+    songId: "58e0cf9b-c386-486b-9690-73032461604e",
+    sourceUrl: "https://suno.com/song/58e0cf9b-c386-486b-9690-73032461604e",
+    generatedAt: "2026-07-17T15:44:06+09:00",
+    generationPrompt: "Warm downtempo instrumental.",
+    model: "v5.5",
+    planAtGeneration: "Pro Plan",
+    rightsEvidencePath: "data/suno-generation-2026-07-17.md",
+  },
+  verifiedFacts: [],
 };
 
 describe("RequestSchema", () => {
-  it("trims and accepts a complete listener request", () => {
+  it("trims and accepts the two-field listener request", () => {
     expect(
       RequestSchema.parse({
         radioName: "  Maya ",
@@ -38,19 +50,23 @@ describe("RequestSchema", () => {
     });
   });
 
-  it("rejects whitespace-only or undersized fields", () => {
-    expect(() => RequestSchema.parse({ radioName: "   ", message: "too short" })).toThrow();
+  it("enforces radioName 1–30 and message 20–760 after trimming", () => {
+    expect(() => RequestSchema.parse({ radioName: " ", message: "x".repeat(20) })).toThrow();
+    expect(() => RequestSchema.parse({ radioName: "x".repeat(31), message: "x".repeat(20) })).toThrow();
+    expect(() => RequestSchema.parse({ radioName: "Maya", message: "x".repeat(19) })).toThrow();
+    expect(() => RequestSchema.parse({ radioName: "Maya", message: "x".repeat(761) })).toThrow();
   });
 });
 
 describe("TrackSchema", () => {
-  it("accepts an excerpt that ends within the source duration", () => {
-    expect(TrackSchema.parse(track).endSeconds).toBe(42.5);
+  it("accepts a rights-recorded local Suno excerpt", () => {
+    expect(TrackSchema.parse(generatedTrack)).toEqual(generatedTrack);
   });
 
-  it("rejects backwards and out-of-range excerpt boundaries", () => {
-    expect(() => TrackSchema.parse({ ...track, startSeconds: 50 })).toThrow();
-    expect(() => TrackSchema.parse({ ...track, endSeconds: 181 })).toThrow();
+  it("rejects nonzero starts, out-of-range ends, and paths outside assets", () => {
+    expect(() => TrackSchema.parse({ ...generatedTrack, excerptStartMs: 1 })).toThrow();
+    expect(() => TrackSchema.parse({ ...generatedTrack, excerptEndMs: 87_801 })).toThrow();
+    expect(() => TrackSchema.parse({ ...generatedTrack, audioPath: "../secret.mp3" })).toThrow();
   });
 });
 
@@ -61,39 +77,40 @@ describe("program scheduling", () => {
     expect(scheduledStartAfterReady(readyAt)).toBe(readyAt + 15_000);
   });
 
-  it("builds a gap-free speech → excerpt → speech timeline", () => {
+  it("builds gap-free HOST → MUSIC → HOST cues over one final audio asset", () => {
     const timeline = createProgramTimeline({
-      intro: {
-        assetId: "intro",
-        audioUrl: "/api/audio/intro",
-        transcript: "Welcome, Maya.",
-        durationMs: 8_000,
-      },
-      track,
-      outro: {
-        assetId: "outro",
-        audioUrl: "/api/audio/outro",
-        transcript: "Thanks for listening.",
-        durationMs: 4_000,
-      },
+      finalAudio: { audioUrl: "/api/audio/program-1", durationMs: 42_000 },
+      intro: { transcript: "Welcome, Maya.", durationMs: 8_000 },
+      track: generatedTrack,
+      outro: { transcript: "Thanks for listening.", durationMs: 4_000 },
     });
 
-    expect(timeline.durationMs).toBe(54_500);
-    expect(timeline.segments.map((segment) => [segment.type, segment.startsAtMs, segment.durationMs])).toEqual([
-      ["SPEECH", 0, 8_000],
-      ["YOUTUBE", 8_000, 42_500],
-      ["SPEECH", 50_500, 4_000],
+    expect(timeline).toMatchObject({
+      audioUrl: "/api/audio/program-1",
+      durationMs: 42_000,
+      isAiVoice: true,
+    });
+    expect(timeline.cues.map((cue) => [cue.type, cue.startsAtMs, cue.durationMs])).toEqual([
+      ["HOST", 0, 8_000],
+      ["MUSIC", 8_000, 30_000],
+      ["HOST", 38_000, 4_000],
     ]);
-    expect(segmentAtElapsedTime(timeline, 8_000)?.type).toBe("YOUTUBE");
-    expect(segmentAtElapsedTime(timeline, 54_500)).toBeNull();
+    expect(cueAtElapsedTime(timeline, 8_000)?.type).toBe("MUSIC");
+    expect(cueAtElapsedTime(timeline, 42_000)).toBeNull();
   });
 });
 
-describe("toDisplayStage", () => {
-  it("keeps detailed server states behind four stable listener stages", () => {
-    expect(toDisplayStage("MODERATING")).toBe("Checking your request");
-    expect(toDisplayStage("SYNTHESIZING_POST_TRACK")).toBe("Giving the host a voice");
-    expect(toDisplayStage("READY")).toBe("Your show is ready");
-    expect(toDisplayStage("FAILED")).toBe("Production stopped");
+describe("audience stages", () => {
+  it("maps every internal state to the specified audience-facing stage", () => {
+    expect(toDisplayStage("QUEUED")).toBe("CHECKING_REQUEST");
+    expect(toDisplayStage("MODERATING")).toBe("CHECKING_REQUEST");
+    expect(toDisplayStage("PLANNING")).toBe("PLANNING_SHOW");
+    expect(toDisplayStage("SYNTHESIZING_SPEECH")).toBe("GENERATING_VOICE");
+    expect(toDisplayStage("ASSEMBLING_AUDIO")).toBe("ASSEMBLING_SHOW");
+    expect(toDisplayStage("READY")).toBe("READY");
+    expect(toDisplayStage("ON_AIR")).toBe("ON_AIR");
+    expect(toDisplayStage("ENDED")).toBe("ENDED");
+    expect(toDisplayStage("FAILED")).toBe("FAILED");
+    expect(DISPLAY_STAGE_COPY.ASSEMBLING_SHOW).toBe("Mixing the finished show");
   });
 });

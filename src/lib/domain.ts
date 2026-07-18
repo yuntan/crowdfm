@@ -12,140 +12,140 @@ export type ListenerRequest = z.infer<typeof RequestSchema>;
 export const TrackSchema = z
   .object({
     id: z.string().min(1),
-    youtubeVideoId: z.string().min(6),
     title: z.string().min(1),
-    artist: z.string().min(1),
+    displayArtist: z.string().min(1),
+    audioPath: z.string().regex(/^assets\/[a-zA-Z0-9-]+\.mp3$/),
     durationMs: z.number().int().positive(),
-    startSeconds: z.number().min(0).default(0),
-    endSeconds: z.number().positive(),
-    tags: z.array(z.string()),
-    mood: z.array(z.string()),
+    excerptStartMs: z.literal(0),
+    excerptEndMs: z.number().int().positive(),
+    tags: z.array(z.string().min(1)),
+    mood: z.array(z.string().min(1)).min(1),
     hasVocals: z.boolean(),
-    licenseUrl: z.string().url(),
-    sourceUrl: z.string().url(),
+    editorialNotes: z.array(z.string().min(1)),
+    provenance: z.object({
+      provider: z.literal("SUNO"),
+      songId: z.string().min(1),
+      sourceUrl: z.string().url(),
+      generatedAt: z.string().datetime({ offset: true }),
+      generationPrompt: z.string().min(1),
+      model: z.string().min(1).optional(),
+      planAtGeneration: z.string().min(1),
+      rightsEvidencePath: z.string().regex(/^data\/[a-zA-Z0-9._/-]+\.md$/),
+    }),
+    verifiedFacts: z.array(
+      z.object({ text: z.string().min(1), sourceUrl: z.string().url() }),
+    ),
   })
   .superRefine((track, context) => {
-    if (track.startSeconds >= track.endSeconds) {
+    if (track.excerptEndMs > track.durationMs) {
       context.addIssue({
         code: "custom",
-        path: ["endSeconds"],
-        message: "endSeconds must be after startSeconds",
-      });
-    }
-    if (track.endSeconds > track.durationMs / 1_000) {
-      context.addIssue({
-        code: "custom",
-        path: ["endSeconds"],
-        message: "endSeconds must be within the source duration",
+        path: ["excerptEndMs"],
+        message: "excerptEndMs must be within the source duration",
       });
     }
   });
 
 export type Track = z.infer<typeof TrackSchema>;
 
-const SegmentBaseSchema = z.object({
+const CueBaseSchema = z.object({
   startsAtMs: z.number().int().min(0),
   durationMs: z.number().int().positive(),
 });
 
-export const SpeechSegmentSchema = SegmentBaseSchema.extend({
-  type: z.literal("SPEECH"),
-  assetId: z.string().min(1),
-  audioUrl: z.string().min(1),
+export const HostCueSchema = CueBaseSchema.extend({
+  type: z.literal("HOST"),
   transcript: z.string().min(1),
 });
 
-export const YoutubeSegmentSchema = SegmentBaseSchema.extend({
-  type: z.literal("YOUTUBE"),
-  videoId: z.string().min(6),
-  startSeconds: z.number().min(0),
-  endSeconds: z.number().positive(),
+export const MusicCueSchema = CueBaseSchema.extend({
+  type: z.literal("MUSIC"),
+  trackId: z.string().min(1),
   title: z.string().min(1),
-  artist: z.string().min(1),
-  sourceUrl: z.string().url(),
-  licenseUrl: z.string().url(),
+  displayArtist: z.string().min(1),
 });
 
-export const ProgramSegmentSchema = z.discriminatedUnion("type", [
-  SpeechSegmentSchema,
-  YoutubeSegmentSchema,
-]);
+export const ProgramCueSchema = z.discriminatedUnion("type", [HostCueSchema, MusicCueSchema]);
 
 export const ProgramTimelineSchema = z
   .object({
+    audioUrl: z.string().regex(/^\/api\/audio\/[a-zA-Z0-9-]+$/),
     durationMs: z.number().int().positive(),
-    segments: z.array(ProgramSegmentSchema).min(1),
+    isAiVoice: z.literal(true),
+    cues: z.array(ProgramCueSchema).length(3),
   })
   .superRefine((timeline, context) => {
     let expectedStart = 0;
-    for (const [index, segment] of timeline.segments.entries()) {
-      if (segment.startsAtMs !== expectedStart) {
+    for (const [index, cue] of timeline.cues.entries()) {
+      if (cue.startsAtMs !== expectedStart) {
         context.addIssue({
           code: "custom",
-          path: ["segments", index, "startsAtMs"],
-          message: "segments must be ordered and gap-free",
+          path: ["cues", index, "startsAtMs"],
+          message: "cues must be ordered and gap-free",
         });
       }
-      expectedStart = segment.startsAtMs + segment.durationMs;
+      expectedStart = cue.startsAtMs + cue.durationMs;
     }
     if (timeline.durationMs !== expectedStart) {
       context.addIssue({
         code: "custom",
         path: ["durationMs"],
-        message: "durationMs must end at the final segment boundary",
+        message: "durationMs must end at the final cue boundary",
       });
+    }
+    if (timeline.cues[0]?.type !== "HOST" || timeline.cues[1]?.type !== "MUSIC" || timeline.cues[2]?.type !== "HOST") {
+      context.addIssue({ code: "custom", path: ["cues"], message: "program cues must be HOST → MUSIC → HOST" });
     }
   });
 
 export type ProgramTimeline = z.infer<typeof ProgramTimelineSchema>;
-export type ProgramSegment = z.infer<typeof ProgramSegmentSchema>;
+export type ProgramCue = z.infer<typeof ProgramCueSchema>;
 
-interface SpeechAsset {
-  assetId: string;
-  audioUrl: string;
+interface SpeechCueInput {
   transcript: string;
   durationMs: number;
 }
 
 export function createProgramTimeline(input: {
-  intro: SpeechAsset;
+  finalAudio: { audioUrl: string; durationMs: number };
+  intro: SpeechCueInput;
   track: Track;
-  outro: SpeechAsset;
+  outro: SpeechCueInput;
 }): ProgramTimeline {
   const track = TrackSchema.parse(input.track);
-  const trackDurationMs = Math.round((track.endSeconds - track.startSeconds) * 1_000);
-  const trackStartsAtMs = input.intro.durationMs;
-  const outroStartsAtMs = trackStartsAtMs + trackDurationMs;
+  const musicDurationMs = track.excerptEndMs - track.excerptStartMs;
+  const musicStartsAtMs = input.intro.durationMs;
+  const outroStartsAtMs = musicStartsAtMs + musicDurationMs;
+  const measuredOutroDurationMs = input.finalAudio.durationMs - outroStartsAtMs;
+  const expectedDurationMs = outroStartsAtMs + input.outro.durationMs;
+
+  if (measuredOutroDurationMs <= 0 || Math.abs(expectedDurationMs - input.finalAudio.durationMs) > 1_000) {
+    throw new Error("Final audio duration does not match its source assets");
+  }
 
   return ProgramTimelineSchema.parse({
-    durationMs: outroStartsAtMs + input.outro.durationMs,
-    segments: [
+    audioUrl: input.finalAudio.audioUrl,
+    durationMs: input.finalAudio.durationMs,
+    isAiVoice: true,
+    cues: [
       {
-        type: "SPEECH",
+        type: "HOST",
         startsAtMs: 0,
         durationMs: input.intro.durationMs,
-        assetId: input.intro.assetId,
-        audioUrl: input.intro.audioUrl,
         transcript: input.intro.transcript,
       },
       {
-        type: "YOUTUBE",
-        startsAtMs: trackStartsAtMs,
-        durationMs: trackDurationMs,
-        videoId: track.youtubeVideoId,
-        startSeconds: track.startSeconds,
-        endSeconds: track.endSeconds,
+        type: "MUSIC",
+        startsAtMs: musicStartsAtMs,
+        durationMs: musicDurationMs,
+        trackId: track.id,
         title: track.title,
-        artist: track.artist,
-        sourceUrl: track.sourceUrl,
-        licenseUrl: track.licenseUrl,
+        displayArtist: track.displayArtist,
       },
       {
-        type: "SPEECH",
+        type: "HOST",
         startsAtMs: outroStartsAtMs,
-        durationMs: input.outro.durationMs,
-        assetId: input.outro.assetId,
-        audioUrl: input.outro.audioUrl,
+        durationMs: measuredOutroDurationMs,
         transcript: input.outro.transcript,
       },
     ],
@@ -156,16 +156,11 @@ export function scheduledStartAfterReady(readyAt: number): number {
   return readyAt + READY_LEAD_TIME_MS;
 }
 
-export function segmentAtElapsedTime(
-  timeline: ProgramTimeline,
-  elapsedMs: number,
-): ProgramSegment | null {
-  if (elapsedMs < 0 || elapsedMs >= timeline.durationMs) {
-    return null;
-  }
+export function cueAtElapsedTime(timeline: ProgramTimeline, elapsedMs: number): ProgramCue | null {
+  if (elapsedMs < 0 || elapsedMs >= timeline.durationMs) return null;
   return (
-    timeline.segments.find(
-      (segment) => elapsedMs >= segment.startsAtMs && elapsedMs < segment.startsAtMs + segment.durationMs,
+    timeline.cues.find(
+      (cue) => elapsedMs >= cue.startsAtMs && elapsedMs < cue.startsAtMs + cue.durationMs,
     ) ?? null
   );
 }
@@ -174,44 +169,58 @@ export const ProgramStatusSchema = z.enum([
   "QUEUED",
   "MODERATING",
   "PLANNING",
-  "SYNTHESIZING_PRE_TRACK",
-  "SYNTHESIZING_POST_TRACK",
+  "SYNTHESIZING_SPEECH",
+  "ASSEMBLING_AUDIO",
   "READY",
-  "LIVE",
+  "ON_AIR",
   "ENDED",
   "FAILED",
 ]);
 
 export type ProgramStatus = z.infer<typeof ProgramStatusSchema>;
 
-export type DisplayStage =
-  | "Request received"
-  | "Checking your request"
-  | "Building your show"
-  | "Giving the host a voice"
-  | "Your show is ready"
-  | "On air"
-  | "Broadcast ended"
-  | "Production stopped";
+export const DisplayStageSchema = z.enum([
+  "CHECKING_REQUEST",
+  "PLANNING_SHOW",
+  "GENERATING_VOICE",
+  "ASSEMBLING_SHOW",
+  "READY",
+  "ON_AIR",
+  "ENDED",
+  "FAILED",
+]);
+
+export type DisplayStage = z.infer<typeof DisplayStageSchema>;
+
+export const DISPLAY_STAGE_COPY: Record<DisplayStage, string> = {
+  CHECKING_REQUEST: "Checking your message",
+  PLANNING_SHOW: "Selecting music and planning the show",
+  GENERATING_VOICE: "Recording the AI host",
+  ASSEMBLING_SHOW: "Mixing the finished show",
+  READY: "Your show is ready",
+  ON_AIR: "On Air",
+  ENDED: "Broadcast ended",
+  FAILED: "We couldn't produce this show",
+};
 
 export function toDisplayStage(status: ProgramStatus): DisplayStage {
   switch (status) {
     case "QUEUED":
-      return "Request received";
     case "MODERATING":
-      return "Checking your request";
+      return "CHECKING_REQUEST";
     case "PLANNING":
-      return "Building your show";
-    case "SYNTHESIZING_PRE_TRACK":
-    case "SYNTHESIZING_POST_TRACK":
-      return "Giving the host a voice";
+      return "PLANNING_SHOW";
+    case "SYNTHESIZING_SPEECH":
+      return "GENERATING_VOICE";
+    case "ASSEMBLING_AUDIO":
+      return "ASSEMBLING_SHOW";
     case "READY":
-      return "Your show is ready";
-    case "LIVE":
-      return "On air";
+      return "READY";
+    case "ON_AIR":
+      return "ON_AIR";
     case "ENDED":
-      return "Broadcast ended";
+      return "ENDED";
     case "FAILED":
-      return "Production stopped";
+      return "FAILED";
   }
 }

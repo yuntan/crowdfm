@@ -5,17 +5,26 @@ import { OpenAIProductionProvider, type ProviderClient } from "@/lib/openai-prov
 
 const track: Track = {
   id: "licensed-one",
-  youtubeVideoId: "video12345",
   title: "Licensed One",
-  artist: "Example Artist",
+  displayArtist: "CrowdFM Original",
+  audioPath: "assets/licensed-one.mp3",
   durationMs: 180_000,
-  startSeconds: 0,
-  endSeconds: 41,
+  excerptStartMs: 0,
+  excerptEndMs: 41_000,
   tags: ["hopeful"],
   mood: ["warm"],
   hasVocals: true,
-  licenseUrl: "https://example.com/license",
-  sourceUrl: "https://youtube.com/watch?v=video12345",
+  editorialNotes: ["Warm and hopeful"],
+  provenance: {
+    provider: "SUNO",
+    songId: "licensed-one",
+    sourceUrl: "https://suno.com/song/licensed-one",
+    generatedAt: "2026-07-17T15:44:06+09:00",
+    generationPrompt: "Warm and hopeful.",
+    planAtGeneration: "Pro Plan",
+    rightsEvidencePath: "data/suno-generation-2026-07-17.md",
+  },
+  verifiedFacts: [],
 };
 
 function fakeClient(): ProviderClient {
@@ -91,7 +100,7 @@ describe("OpenAIProductionProvider", () => {
 
     await expect(provider.synthesize("Welcome to CrowdFM.", "intro")).resolves.toEqual({
       assetId: "speech-1",
-      audioUrl: "/api/audio/speech-1",
+      filePath: "generated/audio/speech-1.mp3",
       durationMs: 1_234,
     });
     expect(client.audio.speech.create).toHaveBeenCalledWith({

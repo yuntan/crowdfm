@@ -1,6 +1,6 @@
 import { ZodError } from "zod";
 
-import { RequestSchema } from "@/lib/domain";
+import { RequestSchema, toDisplayStage } from "@/lib/domain";
 import type { ProgramStore } from "@/lib/program-store";
 
 interface CreateDependencies {
@@ -67,9 +67,9 @@ export function handleGetProgram(
     if (serverNow >= program.startsAt + program.timeline.durationMs) {
       status = "ENDED";
     } else if (serverNow >= program.startsAt) {
-      status = "LIVE";
+      status = "ON_AIR";
     }
   }
 
-  return json({ ...program, status, serverNow }, 200);
+  return json({ ...program, status, displayStage: toDisplayStage(status), serverNow }, 200);
 }

@@ -95,10 +95,10 @@ export class OpenAIProductionProvider implements ProductionProvider {
   }
 
   async plan(request: ListenerRequest): Promise<ShowPlan> {
-    const catalogForModel = this.#catalog.map(({ id, title, artist, tags, mood, hasVocals }) => ({
+    const catalogForModel = this.#catalog.map(({ id, title, displayArtist, tags, mood, hasVocals }) => ({
       id,
       title,
-      artist,
+      displayArtist,
       tags,
       mood,
       hasVocals,
@@ -136,7 +136,7 @@ export class OpenAIProductionProvider implements ProductionProvider {
   async synthesize(
     script: string,
     slot: "intro" | "outro",
-  ): Promise<{ assetId: string; audioUrl: string; durationMs: number }> {
+  ): Promise<{ assetId: string; filePath: string; durationMs: number }> {
     const response = await this.#client.audio.speech.create({
       model: "gpt-4o-mini-tts",
       voice: "marin",
@@ -148,7 +148,7 @@ export class OpenAIProductionProvider implements ProductionProvider {
     const assetId = this.#createId();
     const durationMs = await this.#measureDuration(bytes);
     await this.#writeAsset(assetId, bytes);
-    return { assetId, audioUrl: `/api/audio/${assetId}`, durationMs };
+    return { assetId, filePath: `generated/audio/${assetId}.mp3`, durationMs };
   }
 }
 

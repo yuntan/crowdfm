@@ -2,28 +2,38 @@ import { describe, expect, it } from "vitest";
 
 import { parseCatalog } from "@/lib/catalog";
 
-const validTrack = {
-  id: "licensed-one",
-  youtubeVideoId: "video12345",
-  title: "Licensed One",
-  artist: "Example Artist",
-  durationMs: 180_000,
-  startSeconds: 0,
-  endSeconds: 41,
-  tags: ["hopeful"],
-  mood: ["warm"],
-  hasVocals: true,
-  licenseUrl: "https://example.com/license",
-  sourceUrl: "https://youtube.com/watch?v=video12345",
+const generatedTrack = {
+  id: "quiet-victory",
+  title: "Small Win Tonight",
+  displayArtist: "CrowdFM Original",
+  audioPath: "assets/58e0cf9b-c386-486b-9690-73032461604e.mp3",
+  durationMs: 87_800,
+  excerptStartMs: 0,
+  excerptEndMs: 30_000,
+  tags: ["instrumental"],
+  mood: ["calm"],
+  hasVocals: false,
+  editorialNotes: ["Quiet victory"],
+  provenance: {
+    provider: "SUNO",
+    songId: "58e0cf9b-c386-486b-9690-73032461604e",
+    sourceUrl: "https://suno.com/song/58e0cf9b-c386-486b-9690-73032461604e",
+    generatedAt: "2026-07-17T15:44:06+09:00",
+    generationPrompt: "Warm downtempo instrumental.",
+    model: "v5.5",
+    planAtGeneration: "Pro Plan",
+    rightsEvidencePath: "data/suno-generation-2026-07-17.md",
+  },
+  verifiedFacts: [],
 };
 
 describe("parseCatalog", () => {
-  it("accepts only validated, non-empty track catalogs", () => {
-    expect(parseCatalog([validTrack])).toHaveLength(1);
-    expect(() => parseCatalog([])).toThrow("at least one licensed track");
+  it("accepts a non-empty generated-track catalog", () => {
+    expect(parseCatalog([generatedTrack])).toHaveLength(1);
+    expect(() => parseCatalog([])).toThrow("at least one rights-verified track");
   });
 
-  it("rejects a chorus boundary outside the source duration", () => {
-    expect(() => parseCatalog([{ ...validTrack, endSeconds: 181 }])).toThrow();
+  it("rejects an excerpt beyond the local source duration", () => {
+    expect(() => parseCatalog([{ ...generatedTrack, excerptEndMs: 87_801 }])).toThrow();
   });
 });

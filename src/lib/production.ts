@@ -8,6 +8,11 @@ import {
   type ProgramStatus,
   type Track,
 } from "@/lib/domain";
+import {
+  getProgramAssembler,
+  type ProgramAssembler,
+  type SpeechAsset,
+} from "@/lib/audio-assembler";
 import type { ProgramStore } from "@/lib/program-store";
 
 const ModerationResultSchema = z.object({
@@ -23,7 +28,7 @@ const ShowPlanSchema = z.object({
 
 const SpeechAssetSchema = z.object({
   assetId: z.string().min(1),
-  audioUrl: z.string().min(1),
+  filePath: z.string().min(1),
   durationMs: z.number().int().positive(),
 });
 
@@ -39,18 +44,19 @@ export interface ProductionProvider {
   synthesize(
     script: string,
     slot: "intro" | "outro",
-  ): Promise<{ assetId: string; audioUrl: string; durationMs: number }>;
+  ): Promise<SpeechAsset>;
 }
 
 interface ProductionDependencies {
   store: ProgramStore;
   provider: ProductionProvider;
+  assembler?: ProgramAssembler;
   now?: () => number;
 }
 
 export async function produceProgram(
   programId: string,
-  { store, provider, now = Date.now }: ProductionDependencies,
+  { store, provider, assembler = getProgramAssembler(), now = Date.now }: ProductionDependencies,
 ): Promise<void> {
   let status: ProgramStatus = "QUEUED";
   const request = store.get(programId)?.request;
@@ -73,18 +79,20 @@ export async function produceProgram(
     status = "PLANNING";
     const plan = ShowPlanSchema.parse(await provider.plan(request));
 
-    if (!store.transition(programId, status, "SYNTHESIZING_PRE_TRACK")) return;
-    status = "SYNTHESIZING_PRE_TRACK";
+    if (!store.transition(programId, status, "SYNTHESIZING_SPEECH")) return;
+    status = "SYNTHESIZING_SPEECH";
     const intro = SpeechAssetSchema.parse(await provider.synthesize(plan.introScript, "intro"));
-
-    if (!store.transition(programId, status, "SYNTHESIZING_POST_TRACK")) return;
-    status = "SYNTHESIZING_POST_TRACK";
     const outro = SpeechAssetSchema.parse(await provider.synthesize(plan.outroScript, "outro"));
 
+    if (!store.transition(programId, status, "ASSEMBLING_AUDIO")) return;
+    status = "ASSEMBLING_AUDIO";
+    const finalAudio = await assembler.assemble({ intro, track: plan.track, outro });
+
     const timeline = createProgramTimeline({
-      intro: { ...intro, transcript: plan.introScript },
+      finalAudio,
+      intro: { durationMs: intro.durationMs, transcript: plan.introScript },
       track: plan.track,
-      outro: { ...outro, transcript: plan.outroScript },
+      outro: { durationMs: outro.durationMs, transcript: plan.outroScript },
     });
     const readyAt = now();
     store.transition(programId, status, "READY", {

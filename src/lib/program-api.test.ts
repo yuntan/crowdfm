@@ -62,8 +62,37 @@ describe("program API handlers", () => {
     expect(await response.json()).toMatchObject({
       id: "program-1",
       status: "QUEUED",
+      displayStage: "CHECKING_REQUEST",
       serverNow: 1_721_101_201_000,
     });
+  });
+
+  it("derives ON_AIR and ENDED from server time without changing the shared timeline", async () => {
+    store.create({
+      radioName: "Maya",
+      message: "I finally moved to a new city and need a brave first-night song.",
+    });
+    const readyAt = 1_721_101_200_000;
+    store.transition("program-1", "QUEUED", "READY", {
+      readyAt,
+      startsAt: readyAt + 15_000,
+      timeline: {
+        audioUrl: "/api/audio/program-1",
+        durationMs: 3_000,
+        isAiVoice: true,
+        cues: [
+          { type: "HOST", startsAtMs: 0, durationMs: 1_000, transcript: "Welcome." },
+          { type: "MUSIC", startsAtMs: 1_000, durationMs: 1_000, trackId: "one", title: "One", displayArtist: "CrowdFM Original" },
+          { type: "HOST", startsAtMs: 2_000, durationMs: 1_000, transcript: "Good night." },
+        ],
+      },
+    });
+
+    const live = await handleGetProgram("program-1", store, () => readyAt + 16_000).json();
+    const ended = await handleGetProgram("program-1", store, () => readyAt + 18_000).json();
+
+    expect(live).toMatchObject({ status: "ON_AIR", displayStage: "ON_AIR" });
+    expect(ended).toMatchObject({ status: "ENDED", displayStage: "ENDED" });
   });
 
   it("returns 404 without leaking storage details", async () => {

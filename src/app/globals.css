@@ -1,5 +1,6 @@
 :root { color-scheme: dark; --ink:#17130f; --paper:#f1e8d7; --cream:#fff8ea; --orange:#f05a32; --acid:#d5e94e; --muted:#a89f90; --line:rgba(241,232,215,.16); font-family:Arial,Helvetica,sans-serif; background:var(--ink); color:var(--paper); }
 * { box-sizing:border-box; }
+.program-audio{display:none}.receiver-error{margin:14px 0 0;color:#a82c13;text-align:center;font-size:12px;font-weight:800}
 html { scroll-behavior:smooth; }
 body { margin:0; background:var(--ink); }
 button,input,textarea { font:inherit; }

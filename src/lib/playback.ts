@@ -1,4 +1,4 @@
-import { segmentAtElapsedTime, type ProgramSegment, type ProgramTimeline } from "@/lib/domain";
+import { cueAtElapsedTime, type ProgramCue, type ProgramTimeline } from "@/lib/domain";
 
 export function estimateServerNow(
   observedServerNow: number,
@@ -13,8 +13,8 @@ export type PlaybackState =
   | {
       phase: "live";
       elapsedMs: number;
-      segmentOffsetMs: number;
-      segment: ProgramSegment;
+      cueOffsetMs: number;
+      cue: ProgramCue;
     }
   | { phase: "ended" };
 
@@ -28,15 +28,13 @@ export function derivePlaybackState(
   }
 
   const elapsedMs = serverNow - startsAt;
-  const segment = segmentAtElapsedTime(timeline, elapsedMs);
-  if (!segment) {
-    return { phase: "ended" };
-  }
+  const cue = cueAtElapsedTime(timeline, elapsedMs);
+  if (!cue) return { phase: "ended" };
 
   return {
     phase: "live",
     elapsedMs,
-    segmentOffsetMs: elapsedMs - segment.startsAtMs,
-    segment,
+    cueOffsetMs: elapsedMs - cue.startsAtMs,
+    cue,
   };
 }
