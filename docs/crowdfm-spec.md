@@ -2,7 +2,7 @@
 
 Status: Draft for review
 Scope: OpenAI Build Week hackathon demo
-Last updated: 2026-07-16
+Last updated: 2026-07-17
 
 ## Assumptions
 
@@ -10,13 +10,14 @@ Last updated: 2026-07-16
 2. The hackathon submission prioritizes the isolated demo mode described below. The eventual product remains one shared scheduled station.
 3. The MVP runs and is verified only on the developer's local machine. Cloud deployment and public hosting are out of scope.
 4. The local server runs as a long-lived Node.js process with SQLite and local generated-audio storage.
-5. Only curated, license-checked YouTube videos are eligible for selection.
+5. Only curated, locally stored songs generated with Suno under usage rights that permit the public hackathon demo are eligible for selection.
 6. A submitted demo request is guaranteed to be selected. Normal broadcasts will not guarantee selection.
 7. OpenAI Realtime API is out of scope because the show is produced before broadcast.
+8. Music is generated and reviewed before the demo. Runtime Suno generation and Suno Platform API access are not required for the MVP.
 
 ## Objective
 
-CrowdFM recreates a radio station with a consistent AI personality. Listeners send a radio name and one free-form message. That message may include a specific song or artist, or describe a mood, moment, or musical direction. The AI host selects a track, responds to the message, and produces a short show containing generated speech and YouTube playback.
+CrowdFM recreates a radio station with a consistent AI personality. Listeners send a radio name and one free-form message. That message may describe a mood, moment, or musical direction. The AI host selects a track from a small catalog of pre-generated Suno songs, responds to the message, and produces a short show as one locally assembled audio file.
 
 The production concept is a single scheduled station that everyone hears live. The hackathon demo compresses that experience: one anonymous submission triggers production of one short, isolated demo show. Once the show is ready, it starts after a short countdown and cannot be paused, rewound, skipped, or scrubbed.
 
@@ -26,7 +27,7 @@ The primary audience for the hackathon demo is a judge who must understand the f
 2. See the show being produced.
 3. Receive an in-page completion notification.
 4. Hear the AI host read and respond to the message.
-5. Hear the selected YouTube track begin.
+5. Hear the selected generated track begin.
 
 ## Product Principles
 
@@ -44,7 +45,7 @@ The primary audience for the hackathon demo is a judge who must understand the f
 The local demo page requires no account. It accepts:
 
 - `radioName`: 1–30 characters.
-- `message`: 20–760 characters containing the listener's story and, optionally, a requested song, artist, mood, moment, or musical direction. There is no separate theme field.
+- `message`: 20–760 characters containing the listener's story and, optionally, a mood, moment, or musical direction. A named external song or artist may be treated as style context, but can never be played unless it corresponds to an eligible generated catalog entry. There is no separate theme field.
 
 Example:
 
@@ -57,20 +58,21 @@ After submission, the same page displays these audience-facing stages:
 1. `CHECKING_REQUEST` — Checking your message
 2. `PLANNING_SHOW` — Selecting music and planning the show
 3. `GENERATING_VOICE` — Recording the AI host
-4. `READY` — Your show is ready
-5. `ON_AIR` — On Air
-6. `ENDED` — Broadcast ended
-7. `FAILED` — We couldn't produce this show
+4. `ASSEMBLING_SHOW` — Mixing the finished show
+5. `READY` — Your show is ready
+6. `ON_AIR` — On Air
+7. `ENDED` — Broadcast ended
+8. `FAILED` — We couldn't produce this show
 
 When the show becomes ready, the page changes visibly and plays one short notification sound. Browser push notifications and PWA installation are out of scope.
 
 ### Broadcast entry
 
-The listener presses a single `Tune in` button before playback. This user gesture initializes HTML audio and the YouTube player so browser autoplay rules do not silently block the broadcast.
+The listener presses a single `Tune in` button before playback. This user gesture initializes the HTML audio element so browser autoplay rules do not silently block the broadcast.
 
-When ready, demo mode sets `startsAt` to exactly 15 seconds after the program enters `READY` and displays the countdown. Playback then follows the server-authored timeline. Custom pause, seek, replay, and skip controls do not exist. YouTube's standard player is embedded through the official IFrame Player API with visible controls disabled.
+When ready, demo mode sets `startsAt` to exactly 15 seconds after the program enters `READY` and displays the countdown. Playback then follows the server-authored timeline. Custom pause, seek, replay, and skip controls do not exist.
 
-If a listener reloads or joins late, the client calculates the current segment from the server time and starts at that segment's elapsed offset rather than from the beginning.
+If a listener reloads or joins late, the client calculates the elapsed show time from the server clock and seeks the final program audio to that offset rather than restarting it.
 
 ## Short Demo Show
 
@@ -80,7 +82,7 @@ The demo show contains one request and one track:
 2. Radio name and listener message.
 3. Host response.
 4. Track selection and reason.
-5. A configured excerpt of the YouTube track, starting at the beginning and ending around the first chorus.
+5. A configured excerpt of the generated track, starting at the beginning and ending at or just after the first chorus begins.
 6. Short closing.
 
 For the submitted video, waiting time and music playback may be shortened in editing, but the underlying application must execute the real production flow.
@@ -96,7 +98,7 @@ For the submitted video, waiting time and music playback may be shortened in edi
 - Vitest for unit and integration tests.
 - Playwright for the main browser flow.
 - OpenAI JavaScript SDK.
-- YouTube IFrame Player API.
+- A locally installed FFmpeg executable for deterministic audio normalization, trimming, and concatenation.
 
 The demo runs locally in one long-running Node process with a writable SQLite database and generated-audio directory. No cloud deployment is required.
 
@@ -146,72 +148,96 @@ Use `POST /audio/speech` through the OpenAI SDK with:
 - Voice: start by auditioning `marin`, `coral`, and `shimmer` in English; record the selected voice in configuration rather than scattering it through code.
 - Instructions: speak in natural English as a calm, warm, knowledgeable radio host; avoid high energy, exaggerated reactions, and rushed pacing.
 
-Generate `preTrackScript` and `postTrackScript` as separate audio assets because the YouTube segment plays between them.
+Generate `preTrackScript` and `postTrackScript` as separate intermediate audio assets. The server combines them with the selected music excerpt into one final program MP3 before entering `READY`.
 
 The UI must display `AI-generated host and voice` near the player.
 
-## Curated Track Catalog
+## Music Generation and Curated Track Catalog
 
-The MVP catalog contains 5–10 tracks. Every catalog entry contains:
+The MVP catalog contains 5–10 songs generated manually in the Suno web application before the demo. The exact songs will be chosen later. Music generation is an editorial preparation step, not part of a listener request, so a slow or unavailable Suno service cannot block the live demo and listener text is never sent to Suno.
+
+The demo operator defines a small coverage matrix of moods and energy levels, generates multiple candidates for each gap, and manually selects the strongest outputs. Each candidate must be generated under a plan, terms, or written grant permitting its use in the public hackathon submission, then downloaded into local catalog storage. Do not assume that subscribing later changes the rights for a song generated on a free plan. Retain the prompt, song URL, generation timestamp, model when known, plan at generation, and a local rights record before marking a track eligible. Suno Platform API integration remains out of scope until the account is provisioned and its authenticated API contract and output rights are verified.
+
+Every catalog entry contains:
 
 ```ts
 const TrackSchema = z.object({
   id: z.string(),
-  youtubeVideoId: z.string(),
   title: z.string(),
-  artist: z.string(),
+  displayArtist: z.string(),
+  audioPath: z.string(),
   durationMs: z.number().int().positive(),
-  startSeconds: z.number().min(0).default(0),
-  endSeconds: z.number().positive(),
+  excerptStartMs: z.literal(0),
+  excerptEndMs: z.number().int().positive(),
   tags: z.array(z.string()),
   mood: z.array(z.string()),
   hasVocals: z.boolean(),
+  editorialNotes: z.array(z.string()),
+  provenance: z.object({
+    provider: z.literal("SUNO"),
+    songId: z.string(),
+    sourceUrl: z.string().url(),
+    generatedAt: z.string().datetime(),
+    generationPrompt: z.string(),
+    model: z.string().optional(),
+    planAtGeneration: z.string(),
+    rightsEvidencePath: z.string(),
+  }),
   verifiedFacts: z.array(z.object({
     text: z.string(),
     sourceUrl: z.string().url(),
   })),
-  licenseUrl: z.string().url(),
 });
 ```
 
-For the hackathon demo, `startSeconds` is `0`. `endSeconds` is chosen per track at or just after the first chorus begins, and catalog validation enforces `startSeconds < endSeconds <= durationMs / 1000`. The exact tracks and excerpt boundaries will be decided later.
+For the hackathon demo, `excerptStartMs` is `0`. `excerptEndMs` is chosen per track at or just after the first chorus begins, and catalog validation enforces `0 < excerptEndMs <= durationMs`. The exact tracks and excerpt boundaries will be decided later.
 
-The model cannot invent a video ID or choose outside this catalog. Before recording the demo, every video must be manually smoke-tested locally for embedding, playback, duration, and geographic availability.
+The model cannot invent a track or choose outside this catalog. Before recording the demo, every song must be manually reviewed for audio quality, rights evidence, duration, excerpt boundary, and transition into the closing speech.
+
+### Final program audio
+
+After both speech assets exist, the local worker uses FFmpeg to:
+
+1. Normalize the speech and music inputs to one agreed codec, sample rate, and channel layout.
+2. Trim the selected song from `excerptStartMs = 0` through `excerptEndMs`.
+3. Apply only short boundary fades needed to avoid clicks; do not remix or alter the song's creative content.
+4. Concatenate opening speech, the music excerpt, and closing speech in that order.
+5. Write one final MP3, probe its actual duration, and persist its checksum and cue boundaries.
+
+Intermediate speech files and catalog masters remain server-only. Only the final program asset is exposed to the browser.
 
 ## Program Timeline Contract
 
 The browser consumes a discriminated union. It never receives raw model prompts or internal reasoning.
 
 ```ts
-type ProgramSegment =
+type ProgramCue =
   | {
-      type: "SPEECH";
+      type: "HOST";
       startsAtMs: number;
       durationMs: number;
-      audioUrl: string;
       transcript: string;
     }
   | {
-      type: "YOUTUBE";
+      type: "MUSIC";
       startsAtMs: number;
       durationMs: number;
-      videoId: string;
-      startSeconds: number;
-      endSeconds: number;
+      trackId: string;
       title: string;
-      artist: string;
+      displayArtist: string;
     };
 
 interface ProgramTimeline {
   programId: string;
   startsAt: string;
   durationMs: number;
+  audioUrl: string;
   isAiVoice: true;
-  segments: ProgramSegment[];
+  cues: ProgramCue[];
 }
 ```
 
-`startsAtMs` is relative to the start of the show. Segments must be ordered, non-overlapping, gap-free, and contained within `durationMs`. A YouTube segment's `durationMs` equals `(endSeconds - startSeconds) * 1000`.
+`startsAtMs` is relative to the start of the final program audio. Cues must be ordered, non-overlapping, gap-free, and contained within `durationMs`. The music cue duration equals `excerptEndMs - excerptStartMs`. Cues drive the visible now-playing state; they do not switch media sources.
 
 ## Server State Model
 
@@ -221,8 +247,8 @@ Internal program states:
 QUEUED
   -> MODERATING
   -> PLANNING
-  -> SYNTHESIZING_PRE_TRACK
-  -> SYNTHESIZING_POST_TRACK
+  -> SYNTHESIZING_SPEECH
+  -> ASSEMBLING_AUDIO
   -> READY
   -> ON_AIR
   -> ENDED
@@ -297,7 +323,7 @@ The endpoint never returns prompts, moderation category scores, stack traces, pr
 
 ### `GET /api/audio/:assetId`
 
-Streams a generated MP3 asset. It supports byte-range requests and only serves asset IDs belonging to a ready or previously aired program.
+Streams the final program MP3. It supports byte-range requests and only serves asset IDs belonging to a ready or previously aired program. Intermediate speech and catalog source assets are not addressable through this route.
 
 Failures:
 
@@ -308,14 +334,13 @@ Failures:
 
 1. Poll `GET /api/programs/:id` while production is active.
 2. Estimate server clock offset from the returned `serverNow`.
-3. After the user presses `Tune in`, initialize both audio engines.
+3. After the user presses `Tune in`, initialize the program's HTML audio element.
 4. At or after `startsAt`, calculate `elapsedMs = estimatedServerNow - startsAt`.
-5. Select the segment containing `elapsedMs`.
-6. For speech, set the HTML audio element's `currentTime` to the segment-relative offset.
-7. For YouTube, call object-form `loadVideoById` with the catalog video ID, the calculated segment-relative `startSeconds`, and the catalog `endSeconds`.
-8. Listen for YouTube `onStateChange`, `onError`, and `onAutoplayBlocked` events.
-9. If autoplay is blocked, show a blocking `Tap to return to the broadcast` action.
-10. If a segment fails, show a station error and continue to the next segment only when the server timeline says it has started.
+5. Set the audio element's `currentTime` to `min(elapsedMs, durationMs) / 1000` and start playback.
+6. Select the cue containing `elapsedMs` to update the transcript or now-playing display.
+7. Listen for audio `playing`, `waiting`, `error`, and `ended` events.
+8. If autoplay is blocked, show a blocking `Tap to return to the broadcast` action.
+9. If the final asset cannot be loaded, show a station error; there is no alternate client-side media source to skip to.
 
 Periodic drift correction across multiple listeners is not required for the hackathon demo. The timeline contract is designed so it can be added later.
 
@@ -332,11 +357,10 @@ components/
   live-player.tsx
 lib/
   api/                    shared request/response schemas
-  catalog/                curated track loading and validation
+  catalog/                generated-track metadata and validation
   db/                     SQLite access and migrations
   openai/                 moderation, planning, and speech adapters
-  programs/               state machine, worker, and timeline builder
-  youtube/                player adapter and playback calculations
+  programs/               state machine, worker, audio assembly, and timeline builder
 generated/                runtime audio files; never committed
 data/
   catalog.json            curated tracks and sources
@@ -380,9 +404,10 @@ export function toDisplayStage(status: ProgramStatus): DisplayStage {
       return "CHECKING_REQUEST";
     case "PLANNING":
       return "PLANNING_SHOW";
-    case "SYNTHESIZING_PRE_TRACK":
-    case "SYNTHESIZING_POST_TRACK":
+    case "SYNTHESIZING_SPEECH":
       return "GENERATING_VOICE";
+    case "ASSEMBLING_AUDIO":
+      return "ASSEMBLING_SHOW";
     case "READY":
       return "READY";
     case "ON_AIR":
@@ -402,19 +427,20 @@ export function toDisplayStage(status: ProgramStatus): DisplayStage {
 
 ### Unit tests
 
-- Request and catalog validation.
+- Request, generated-track catalog, and rights-metadata validation.
 - State-transition legality.
 - Structured show-plan validation.
-- Timeline ordering, gaps, and duration calculations.
-- Late-join segment and offset calculation.
+- Final-audio cue ordering, gaps, and duration calculations.
+- Late-join audio offset and cue calculation.
 - Display-stage mapping.
 
 ### Integration tests
 
-- API contracts with OpenAI and YouTube adapters mocked.
+- API contracts with OpenAI and audio-assembly adapters mocked.
 - Moderation rejection does not start production.
 - Unknown model-selected track IDs fail safely.
 - Failed speech generation produces a stable `FAILED` response.
+- Failed FFmpeg assembly never exposes a partial program.
 - Audio range requests.
 
 ### End-to-end tests
@@ -423,11 +449,11 @@ export function toDisplayStage(status: ProgramStatus): DisplayStage {
 - Observe production stages.
 - Receive ready notification.
 - Join the countdown.
-- Hear mocked speech followed by a mocked YouTube segment.
+- Hear one mocked program asset and observe its host → music → host cue changes.
 - Confirm that playback controls are absent.
 - Reload during playback and resume at the calculated broadcast position.
 
-The real OpenAI and YouTube integration is tested manually on the local demo machine before recording the submission video. Automated tests must not spend API credits or depend on public video availability.
+The real OpenAI speech integration, FFmpeg assembly, and final generated tracks are tested manually on the local demo machine before recording the submission video. Automated tests must not spend OpenAI or Suno credits.
 
 ## Boundaries
 
@@ -436,14 +462,14 @@ The real OpenAI and YouTube integration is tested manually on the local demo mac
 - Validate user input, catalog files, model output, and provider responses.
 - Keep the OpenAI API key server-side.
 - Disclose that the voice is AI-generated.
-- Preserve source and license URLs for every eligible track.
+- Preserve Suno provenance and rights evidence for every eligible track.
 - Log state transitions and provider request IDs without logging full listener messages.
 
 ### Ask first
 
 - Add an external database, queue, object store, authentication provider, or email service.
 - Change the public REST contract or timeline schema.
-- Add arbitrary YouTube search.
+- Add runtime music generation or any unreviewed external music source.
 - Deploy the MVP or add any cloud infrastructure.
 
 ### Never
@@ -451,9 +477,10 @@ The real OpenAI and YouTube integration is tested manually on the local demo mac
 - Commit secrets or generated listener data.
 - Send the OpenAI API key to the browser.
 - Read flagged content on air.
-- Let model output select an unregistered video ID.
+- Let model output select an unregistered track.
 - Add unsourced artist claims to the script.
-- Download, extract, remix, or redistribute YouTube audio.
+- Import a Suno output whose generation-time rights do not permit the public hackathon demo.
+- Expose catalog master files or intermediate speech assets through the public audio route.
 - Present the AI voice as a human speaker.
 
 ## Success Criteria
@@ -461,9 +488,9 @@ The real OpenAI and YouTube integration is tested manually on the local demo mac
 1. A demo operator can open the local URL and submit a request without authentication.
 2. Invalid or moderated requests fail with a clear, stable error.
 3. A valid request produces a schema-valid show plan using `gpt-5.6`.
-4. The selected track always belongs to the curated catalog.
-5. Two speech assets are generated using `gpt-4o-mini-tts`.
-6. The finished program contains a gap-free speech → YouTube → speech timeline.
+4. The selected track always belongs to the rights-verified generated catalog.
+5. Two speech assets are generated using `gpt-4o-mini-tts` and remain server-only.
+6. FFmpeg produces one final MP3 with gap-free host → music → host cues.
 7. The page shows production progress and an in-page/audio completion notification.
 8. The listener enters through one user gesture and sees a 15-second scheduled countdown.
 9. Playback provides no pause, seek, replay, or skip UI.
@@ -477,7 +504,8 @@ The real OpenAI and YouTube integration is tested manually on the local demo mac
 - Native mobile apps and push notifications.
 - User accounts.
 - Full 30-minute or multi-request shows.
-- Arbitrary YouTube search.
+- Runtime Suno generation or Suno Platform API integration.
+- Arbitrary external music search.
 - Real-time AI generation.
 - Listener reaction processing.
 - Human editorial review.
@@ -488,7 +516,7 @@ The real OpenAI and YouTube integration is tested manually on the local demo mac
 
 ## Open Questions for Review
 
-1. Which 5–10 licensed tracks will be used, and what is the per-track `endSeconds` boundary near the first chorus?
+1. Which 5–10 Suno-generated tracks will be used, and what is the per-track `excerptEndMs` boundary near the first chorus?
 2. Which English TTS voice wins the audition among `marin`, `coral`, and `shimmer`?
 
 ## Documentation Sources
@@ -497,5 +525,9 @@ The real OpenAI and YouTube integration is tested manually on the local demo mac
 - OpenAI Structured Outputs: https://developers.openai.com/api/docs/guides/structured-outputs
 - OpenAI text-to-speech: https://developers.openai.com/api/docs/guides/text-to-speech
 - OpenAI Moderation: https://developers.openai.com/api/docs/guides/moderation
-- YouTube IFrame Player API: https://developers.google.com/youtube/iframe_api_reference
+- Suno Platform research and access constraints: `docs/research/suno-platform.md`
+- Suno Terms of Service: https://about.suno.com/terms
+- Suno paid-plan output rights: https://help.suno.com/en/articles/9601665
+- Suno free-plan output rights: https://help.suno.com/en/articles/9601601
+- FFmpeg documentation: https://ffmpeg.org/documentation.html
 - Next.js Route Handlers: https://nextjs.org/docs/app/api-reference/file-conventions/route

@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted; YouTube playback portions superseded by ADR-002
 
 ## Date
 
