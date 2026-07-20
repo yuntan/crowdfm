@@ -48,7 +48,11 @@ test("keeps the request line usable at a mobile viewport", async ({ page }) => {
 
   await expect(page.getByRole("heading", { name: /Radio made for you/i })).toBeVisible();
   await expect(page.getByLabel("Radio name")).toBeVisible();
-  await expect(page.getByLabel("Your message")).toBeVisible();
+  const message = page.getByLabel("Your message");
+  await expect(message).toBeVisible();
+  await expect(message).not.toHaveValue("");
+  const exampleLength = (await message.inputValue()).length;
+  await expect(page.getByText(`${exampleLength} / 760`)).toBeVisible();
   await expect(page.getByRole("button", { name: "Create my show" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: "test-results/crowdfm-mobile.png", fullPage: true });
