@@ -160,7 +160,7 @@ Every implementation task is complete only when:
 
 - [ ] pnpm lint, pnpm typecheck, pnpm test, and pnpm build pass.
 - [ ] The app, SQLite database, worker, and generated-audio directory operate entirely on the local demo machine.
-- [ ] Placeholder catalog fixtures are sufficient for automated work; final licensed tracks remain a later decision.
+- [x] Automated work uses mock fixtures; the real provider uses the rights-recorded catalog in `data/suno-tracks.json` while master audio remains ignored.
 
 ## Phase 2: Submit and Moderate a Request
 

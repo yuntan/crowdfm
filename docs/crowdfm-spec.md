@@ -154,7 +154,7 @@ The UI must display `AI-generated host and voice` near the player.
 
 ## Music Generation and Curated Track Catalog
 
-The MVP catalog contains 5–10 songs generated manually in the Suno web application before the demo. The exact songs will be chosen later. Music generation is an editorial preparation step, not part of a listener request, so a slow or unavailable Suno service cannot block the live demo and listener text is never sent to Suno.
+The MVP catalog contains ten songs generated manually in the Suno web application before the demo. One candidate per editorial theme is recorded in `data/suno-tracks.json`; the MP3 masters remain local under ignored `assets/`. Music generation is an editorial preparation step, not part of a listener request, so a slow or unavailable Suno service cannot block the live demo and listener text is never sent to Suno.
 
 The demo operator defines a small coverage matrix of moods and energy levels, generates multiple candidates for each gap, and manually selects the strongest outputs. Each candidate must be generated under a plan, terms, or written grant permitting its use in the public hackathon submission, then downloaded into local catalog storage. Do not assume that subscribing later changes the rights for a song generated on a free plan. Retain the prompt, song URL, generation timestamp, model when known, plan at generation, and a local rights record before marking a track eligible. Suno Platform API integration remains out of scope until the account is provisioned and its authenticated API contract and output rights are verified.
 
@@ -190,7 +190,7 @@ const TrackSchema = z.object({
 });
 ```
 
-For the hackathon demo, `excerptStartMs` is `0`. `excerptEndMs` is chosen per track at or just after the first chorus begins, and catalog validation enforces `0 < excerptEndMs <= durationMs`. The exact tracks and excerpt boundaries will be decided later.
+For the hackathon demo, `excerptStartMs` is `0`. The importer proposes a per-track `excerptEndMs` at or just after the first hook begins, and catalog validation enforces `0 < excerptEndMs <= durationMs`. The selected values and reproducible measurements are stored in `data/suno-tracks.json` and `data/suno-analysis.json`.
 
 The model cannot invent a track or choose outside this catalog. Before recording the demo, every song must be manually reviewed for audio quality, rights evidence, duration, excerpt boundary, and transition into the closing speech.
 
@@ -514,10 +514,10 @@ The real OpenAI speech integration, FFmpeg assembly, and final generated tracks 
 - Cloud deployment and public hosting.
 - Public-environment abuse protection such as distributed rate limiting.
 
-## Open Questions for Review
+## Final Editorial Checklist
 
-1. Which 5–10 Suno-generated tracks will be used, and what is the per-track `excerptEndMs` boundary near the first chorus?
-2. Which English TTS voice wins the audition among `marin`, `coral`, and `shimmer`?
+1. Audition the preview of every track used in a public recording and override any unsuitable automatic selection or boundary.
+2. Use the `marin` English TTS voice selected for the submitted implementation.
 
 ## Documentation Sources
 

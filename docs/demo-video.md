@@ -24,7 +24,7 @@
 - 音声でCodexとGPT-5.6の使用方法を説明する。
 - アプリUI、AIパーソナリティー音声、ナレーション、画面内字幕を英語に統一する。
 - 許可のない著作権音楽を使わない。
-- YouTube再生に使う曲は、自作、CC0、適切なCreative Commons、または明示的な許諾があるものに限定する。
+- 番組内の曲はSuno Pro契約中に生成し、生成時点の権利記録を残したCrowdFMオリジナルだけを使う。
 - 曲のクレジットとライセンスURLを動画説明欄に記載する。
 
 公式要件: https://openai.devpost.com/rules
@@ -52,7 +52,7 @@ I want to enjoy the achievement quietly, so please choose a calm instrumental tr
 
 - AIパーソナリティーがラジオネームとお便りを読んでいる。
 - AIの返答から曲紹介へつながる。
-- YouTube動画が再生を開始する。
+- 一つの完成済み番組音声がAIホストからオリジナル曲へ切り替わる。
 
 AIパーソナリティーの例（英語音声・英語字幕）:
 
@@ -153,20 +153,20 @@ AIパーソナリティーの台本例（英語音声）:
 
 実際の生成結果を使う。収録用に手で書き換えない。
 
-### 1:55–2:13 — YouTube再生
+### 1:55–2:13 — オリジナル曲再生
 
 画面:
 
-- AIトークからYouTube動画へ自動で切り替わる。
-- 曲名、アーティスト、選曲理由を表示。
+- AIトークから同じ番組MP3内のオリジナル曲へ自動で切り替わる。
+- 曲名と`CrowdFM Original`の表示を見せる。
 - 通常の一時停止・スキップ・シークUIがないことを見せる。
-- ライセンス表示へのリンクを見せる。
+- 画面下部の`Rights-recorded generated music catalog`表示を見せる。
 
 英語ナレーション:
 
-> The browser now follows a server-authored timeline, switching from generated speech to the approved YouTube track. The listener cannot pause, skip, or restart the show.
+> The browser now follows a server-authored timeline inside one finished audio file, moving from generated speech to a rights-recorded original track. The listener cannot pause, skip, or restart the show.
 
-アプリでは曲の冒頭から、曲ごとに設定した最初のサビ付近までを再生してエンディングトークへ切り替える。動画内で音楽を聴かせるのは5〜8秒程度とし、残りは編集で短縮する。ナレーションと重なる場合は音量を下げる。
+アプリではSunoで事前生成した曲の冒頭から、曲ごとに設定した最初のサビ付近までを再生してエンディングトークへ切り替える。動画内で音楽を聴かせるのは5〜8秒程度とし、残りは編集で短縮する。ナレーションと重なる場合は音量を下げる。
 
 ### 2:13–2:34 — 技術の中核
 
@@ -181,17 +181,16 @@ GPT-5.6 + Structured Outputs
     ↓
 gpt-4o-mini-tts
     ↓
-Speech → YouTube → Speech timeline
+FFmpeg: Speech → Original music → Speech
 ```
 
 実際の構造化JSONを短く表示する。
 
 ```json
 {
-  "selectedTrackId": "track_...",
-  "selectionReason": "...",
-  "preTrackScript": "...",
-  "postTrackScript": "..."
+  "trackId": "quiet-victory",
+  "introScript": "...",
+  "outroScript": "..."
 }
 ```
 
@@ -235,7 +234,7 @@ Speech → YouTube → Speech timeline
 - 放送開始カウントダウン。
 - AI音声の再生。
 - お便りと返答の字幕。
-- YouTube動画への切り替え。
+- AIホストからオリジナル曲への切り替え。
 - Now Playingと選曲理由。
 - AI音声の開示。
 - 曲のライセンス情報。
@@ -250,10 +249,10 @@ Speech → YouTube → Speech timeline
 - [ ] ログインなしで送信できる。
 - [ ] モデレーション、台本、TTSが本番APIで成功する。
 - [ ] 選ばれた曲が必ず登録済みカタログにある。
-- [ ] YouTube動画をデモ環境で埋め込み再生できる。
+- [ ] FFmpegでAIホスト・選択曲・クロージングが一つのMP3に結合される。
 - [ ] `READY`から15秒後に放送が始まる。
 - [ ] 曲の冒頭から設定済みのサビ付近まで再生し、エンディングトークへ切り替わる。
-- [ ] 生成音声とYouTubeの切り替えに不自然な無音がない。
+- [ ] 生成音声とオリジナル曲の切り替えに不自然な無音がない。
 - [ ] `Tune in` の一回の操作で音声再生を開始できる。
 - [ ] AI音声であることを表示している。
 - [ ] 失敗時にAPIキーや内部エラーを表示しない。
@@ -264,7 +263,7 @@ Speech → YouTube → Speech timeline
 - [ ] ライセンスURLを保存した。
 - [ ] 必要なクレジットをアプリと動画説明欄へ記載した。
 - [ ] 許可のないBGMを動画編集で追加していない。
-- [ ] 標準YouTubeプレイヤーの表示を不正に隠していない。
+- [ ] ローカルのSunoマスター音源をリポジトリや公開URLへ露出していない。
 
 ### 動画
 
