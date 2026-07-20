@@ -1,5 +1,12 @@
 # CrowdFM — Devpost submission copy
 
+## Submission status
+
+- Submitted to OpenAI Build Week on July 20, 2026 at 20:48 JST.
+- Devpost project: https://devpost.com/software/crowdfm
+- Public demo video: https://youtu.be/wtK3uNK7rLk
+- Source repository: https://github.com/yuntan/crowdfm
+
 ## Elevator pitch (200/200 characters)
 
 CrowdFM turns listener messages into one shared live radio show, using GPT-5.6 to select licensed music, write grounded host scripts, and schedule an AI-voiced broadcast that no one can pause or skip.
