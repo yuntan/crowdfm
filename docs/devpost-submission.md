@@ -66,6 +66,22 @@ Next.js, React, TypeScript, Node.js, SQLite, Zod, OpenAI API, GPT-5.6, OpenAI Mo
 
 Run locally on macOS with Node.js 24+, pnpm 11, and FFmpeg. Execute `pnpm install && pnpm dev`, open `http://localhost:3000`, submit the prefilled request, and press Tune in when READY. Default mock mode needs no keys or licensed audio and reproduces the complete scheduled host → music → host broadcast. See README for the optional real-provider setup.
 
+## YouTube metadata
+
+Title: `CrowdFM — AI-Native Live Radio | OpenAI Build Week`
+
+Description:
+
+> CrowdFM turns a listener message into a short radio show with a consistent AI host, an original song selected for that story, and a fixed airtime. Once the broadcast begins, there is no pause, skip, replay, or scrub control.
+>
+> Built for OpenAI Build Week with Codex, GPT-5.6 Structured Outputs, OpenAI Moderation, gpt-4o-mini-tts, Next.js, SQLite, Zod, and FFmpeg.
+>
+> Source and local setup: https://github.com/yuntan/crowdfm
+>
+> Music in this demo: “Small Win Tonight” — CrowdFM Original. Generated with Suno v5.5 under a Pro plan on July 17, 2026. Source: https://suno.com/song/58e0cf9b-c386-486b-9690-73032461604e
+>
+> The host and narration are AI-generated voices. Music provenance and generation-time rights evidence are documented in the repository.
+
 ## Required custom answers
 
 - Submitter Type: Individual
