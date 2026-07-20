@@ -1,6 +1,6 @@
 # Curated track catalog
 
-`suno-tracks.json` is the validated catalog consumed by the real OpenAI provider. `tracks.json` is an unused legacy placeholder and remains empty. Mock mode does not require either catalog or any master audio.
+`suno-tracks.json` is the validated catalog consumed by both the real OpenAI provider and the mock fallback. `tracks.json` is an unused legacy placeholder and remains empty. Both runtime modes require the matching audio files under `assets/`; judges receive the ten selected beginning-to-first-hook excerpts through the Devpost attachment rather than Git.
 
 The Suno preparation workflow uses:
 

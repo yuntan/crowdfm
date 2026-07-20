@@ -6,30 +6,42 @@ CrowdFM turns a listener message into a short radio show with a consistent AI ho
 
 Built for **OpenAI Build Week**, the MVP runs entirely on one local machine. It does not require a cloud deployment.
 
-## Run the judge-ready demo
+## Run the judge-ready real AI demo
 
 Requirements:
 
 - Node.js 24 or newer
 - pnpm 11
 - FFmpeg on `PATH`
-- macOS for the mock host voice (`say`); the real provider is platform-independent
+- An OpenAI API key supplied by the judge
+- `crowdfm-judge-audio-pack.zip`, attached to the Devpost submission
 
 ```bash
 pnpm install
+unzip /path/to/crowdfm-judge-audio-pack.zip
+cp .env.example .env.local
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The default `mock` provider needs no API key or music download. Submit the prefilled radio name and message, watch the production stages, press **Tune in**, and wait for the 15-second scheduled airtime. The mock assembles a deterministic host → music → host MP3 locally so judges can test the complete playback contract without spending API credits.
+Before `pnpm dev`, edit `.env.local`:
 
-## Run the real AI production flow
+```dotenv
+CROWDFM_PROVIDER=openai
+OPENAI_API_KEY=<your OpenAI API key>
+CROWDFM_CATALOG_PATH=data/suno-tracks.json
+```
 
-The submitted demo video uses the real provider. The repository includes catalog metadata and generation-time rights evidence, but deliberately excludes the licensed MP3 masters.
+Extract the pack at the repository root so its ten MP3s resolve as `assets/<Suno song ID>.mp3`. Open [http://localhost:3000](http://localhost:3000), submit the prefilled radio name and message, watch GPT-5.6 select a track and write the show, then press **Tune in** and wait for the 15-second scheduled airtime.
 
-1. Copy `.env.example` to `.env.local`.
-2. Set `OPENAI_API_KEY`, `CROWDFM_PROVIDER=openai`, and `CROWDFM_CATALOG_PATH=data/suno-tracks.json`.
-3. Place the rights-verified Suno masters in `assets/` using the filenames referenced by `data/suno-tracks.json`.
-4. Run `pnpm dev`.
+The judge pack contains only the ten selected beginning-to-first-hook excerpts that the runtime can play. It excludes the rejected candidates and unused portions of the masters, is not committed to Git, and is not covered by the repository's MIT License.
+
+## API-key-free fallback
+
+Mock mode still requires the judge audio pack because it replaces moderation, planning, and speech generation—not the selected music. Leave `CROWDFM_PROVIDER=mock` in `.env.local` to use the first catalog track with a deterministic script. macOS uses `say` for the mock host voice; other platforms fall back to generated tones.
+
+## Real AI production flow
+
+The submitted demo video and the judge-ready path use the real provider. The repository includes catalog metadata and generation-time rights evidence, while the Devpost attachment supplies the exact runtime excerpts without placing audio under the MIT-licensed source tree.
 
 Real production uses:
 

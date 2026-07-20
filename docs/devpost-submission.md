@@ -6,6 +6,7 @@
 - Devpost project: https://devpost.com/software/crowdfm
 - Public demo video: https://youtu.be/wtK3uNK7rLk
 - Source repository: https://github.com/yuntan/crowdfm
+- Judge audio pack: `crowdfm-judge-audio-pack.zip` (attached to Devpost, not Git)
 
 ## Elevator pitch (200/200 characters)
 
@@ -71,7 +72,7 @@ Next.js, React, TypeScript, Node.js, SQLite, Zod, OpenAI API, GPT-5.6, OpenAI Mo
 
 ## Judge testing instructions
 
-Run locally on macOS with Node.js 24+, pnpm 11, and FFmpeg. Execute `pnpm install && pnpm dev`, open `http://localhost:3000`, submit the prefilled request, and press Tune in when READY. Default mock mode needs no keys or licensed audio and reproduces the complete scheduled host → music → host broadcast. See README for the optional real-provider setup.
+Run locally with Node.js 24+, pnpm 11, FFmpeg, and an OpenAI API key. Download the attached `crowdfm-judge-audio-pack.zip`, extract it at the repository root so the ten excerpts appear under `assets/`, copy `.env.example` to `.env.local`, and set `CROWDFM_PROVIDER=openai`, `OPENAI_API_KEY`, and `CROWDFM_CATALOG_PATH=data/suno-tracks.json`. Execute `pnpm install && pnpm dev`, open `http://localhost:3000`, submit the prefilled request, and press Tune in when READY. The attachment contains the exact rights-verified beginning-to-first-hook excerpts used by the runtime; music is not committed to Git or covered by the MIT License.
 
 ## YouTube metadata
 
