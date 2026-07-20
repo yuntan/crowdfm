@@ -11,12 +11,42 @@ export const REQUEST_EXAMPLES = [
   "I have felt creatively stuck lately, but tonight a new idea finally arrived. Please play something dreamy and spacious that helps me stay in that feeling.",
 ] as const;
 
-export function pickRequestExample(random: () => number = Math.random): string {
+export const RADIO_NAME_PREFIXES = [
+  "Midnight",
+  "Golden",
+  "Velvet",
+  "Neon",
+  "Quiet",
+  "Cosmic",
+  "Silver",
+  "Sunday",
+] as const;
+
+export const RADIO_NAME_SUFFIXES = [
+  "Echo",
+  "Comet",
+  "Sparrow",
+  "Signal",
+  "Lantern",
+  "Satellite",
+  "Dreamer",
+  "Voyager",
+] as const;
+
+function pickRandom<T>(values: readonly T[], random: () => number): T {
   const index = Math.min(
-    REQUEST_EXAMPLES.length - 1,
-    Math.max(0, Math.floor(random() * REQUEST_EXAMPLES.length)),
+    values.length - 1,
+    Math.max(0, Math.floor(random() * values.length)),
   );
-  return REQUEST_EXAMPLES[index] as string;
+  return values[index] as T;
+}
+
+export function pickRequestExample(random: () => number = Math.random): string {
+  return pickRandom(REQUEST_EXAMPLES, random);
+}
+
+export function generateRadioName(random: () => number = Math.random): string {
+  return `${pickRandom(RADIO_NAME_PREFIXES, random)} ${pickRandom(RADIO_NAME_SUFFIXES, random)}`;
 }
 
 export function RequestForm({
@@ -26,10 +56,14 @@ export function RequestForm({
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   submitting: boolean;
 }) {
+  const [radioName, setRadioName] = useState("");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => setMessage(pickRequestExample()));
+    const frame = requestAnimationFrame(() => {
+      setRadioName(generateRadioName());
+      setMessage(pickRequestExample());
+    });
     return () => cancelAnimationFrame(frame);
   }, []);
 
@@ -41,6 +75,8 @@ export function RequestForm({
         name="radioName"
         maxLength={30}
         required
+        value={radioName}
+        onChange={(event) => setRadioName(event.target.value)}
         placeholder="What should the host call you?"
         autoComplete="nickname"
       />

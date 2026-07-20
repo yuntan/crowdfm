@@ -47,7 +47,9 @@ test("keeps the request line usable at a mobile viewport", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByRole("heading", { name: /Radio made for you/i })).toBeVisible();
-  await expect(page.getByLabel("Radio name")).toBeVisible();
+  const radioName = page.getByLabel("Radio name");
+  await expect(radioName).toBeVisible();
+  await expect(radioName).toHaveValue(/^[A-Za-z]+ [A-Za-z]+$/);
   const message = page.getByLabel("Your message");
   await expect(message).toBeVisible();
   await expect(message).not.toHaveValue("");
