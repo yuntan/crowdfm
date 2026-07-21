@@ -16,55 +16,55 @@ CrowdFM turns listener messages into one shared live radio show, using GPT-5.6 t
 
 ### Inspiration
 
-Music services have made listening infinitely convenient, but they have also made it solitary. Everyone gets a different recommendation queue and controls every second of it. What I missed was radio: a host with a point of view, a show shaped by messages from listeners, and the feeling that a moment is happening now rather than waiting in a playlist.
+Music services have made listening easy, but often solitary. Each person gets a different recommendation queue and controls every second. I missed radio: a host with a point of view, a show shaped by listener messages, and a shared moment that does not wait in a playlist.
 
-CrowdFM asks what an AI-native radio station could feel like. It starts small for Build Week: one listener story becomes one complete show, produced locally and scheduled fifteen seconds after it is ready.
+CrowdFM explores how an AI-native radio station could work. For Build Week, it starts small: the app turns one listener story into a complete show, produces it locally, and schedules it fifteen seconds after it is ready.
 
 ### What it does
 
-A listener submits a radio name and a short message about what is happening in their life. CrowdFM moderates the request, asks GPT-5.6 to choose from a curated catalog of original songs, and writes a warm host response grounded only in that message and verified catalog metadata.
+A listener submits a radio name and a short message about their life. CrowdFM moderates the request. GPT-5.6 then chooses from a curated catalog of original songs and writes a warm host response based only on the message and verified catalog metadata.
 
-The host introduction and closing are recorded with OpenAI text-to-speech. CrowdFM then uses FFmpeg to assemble the two speech clips and the beginning-to-first-hook excerpt of the selected song into one continuous MP3. When production reaches READY, the server assigns an airtime exactly fifteen seconds later.
+OpenAI text-to-speech records the host's introduction and closing. CrowdFM uses FFmpeg to join those clips with an excerpt that runs from the start of the selected song to its first hook. The result is one continuous MP3. When production reaches READY, the server sets the airtime exactly fifteen seconds later.
 
-The listener presses Tune in once to satisfy browser audio rules. From there, the server clock owns the experience. There are no pause, seek, skip, or replay controls. Reloading or arriving late resumes at the current broadcast offset instead of restarting the show. The UI follows the same timeline to move from AI host to now playing to sign-off.
+The listener presses Tune in once to meet browser audio rules. The server clock then controls playback. The app has no pause, seek, skip, or replay controls. A late listener, or one who reloads, joins at the current broadcast offset instead of restarting the show. The same timeline moves the UI from AI host to now playing to sign-off.
 
 ### How I built it
 
-CrowdFM is a local-only Next.js application with TypeScript, React, Node route handlers, SQLite state, Zod validation, the OpenAI JavaScript SDK, and FFmpeg.
+CrowdFM is a local Next.js app built with TypeScript, React, Node route handlers, SQLite, Zod, the OpenAI JavaScript SDK, and FFmpeg.
 
-GPT-5.6 receives the sanitized listener message, a host persona, and the complete eligible catalog. Strict Structured Outputs return an intro script, outro script, and a catalog track ID. The server rejects any ID not present in the validated catalog, so the model cannot invent a song or filesystem path. `gpt-4o-mini-tts` records the host with a consistent voice. OpenAI moderation runs before either step.
+GPT-5.6 receives the sanitized listener message, a host persona, and the full eligible catalog. Strict Structured Outputs make it return an introduction, a closing, and a catalog track ID. The server rejects any ID outside the validated catalog, so the model cannot invent a song or file path. `gpt-4o-mini-tts` records both host segments in the same voice. OpenAI moderation runs first.
 
-The music catalog was prepared separately in Suno under a Pro plan. I generated two candidates for each of ten editorial themes, preserved prompts and source URLs, downloaded the masters locally, and built a deterministic analysis/import tool that measures each file, ranks each pair, and proposes a first-hook boundary. The source MP3s remain local and are not committed; the repository contains metadata and generation-time rights records.
+I prepared the music catalog in Suno under a Pro plan. For each of ten editorial themes, I generated two candidates and saved their prompts and source URLs. I then downloaded the masters and built a deterministic import tool that measures each file, ranks each pair, and proposes where the first hook ends. The source MP3s stay local and out of Git; the repository contains only metadata and rights records from the time of generation.
 
-The final audio is represented by a gap-free HOST → MUSIC → HOST cue timeline. Program transitions are guarded in SQLite, and the client derives countdown, live offset, current cue, and ended state from server time.
+A gap-free HOST → MUSIC → HOST cue timeline describes the final audio. SQLite guards program transitions. The client derives the countdown, live offset, current cue, and ended state from server time.
 
 ### How I used Codex
 
-Codex was my continuous engineering partner during Build Week. I used it to challenge the core product idea, turn the decisions into a detailed specification, design the production state machine and timeline contract, implement each vertical slice, and add failure-focused tests before refactoring. It also helped build the Suno batch analysis pipeline, revise the architecture from multiple browser media sources to one assembled audio file, and verify the complete browser journey.
+I used Codex throughout Build Week. It challenged the product idea, helped turn my decisions into a detailed specification, designed the production state machine and timeline contract, and helped implement each vertical slice. It also helped write failure tests, build the Suno batch analysis tool, replace several browser media sources with one assembled audio file, and verify the full browser journey.
 
-The repository's dated commit history shows that progression. I kept the product and rights decisions human-owned: the radio metaphor, local-only boundary, scheduling behavior, catalog themes and prompts, licensing policy, and editorial acceptance remain my responsibility.
+The repository's dated commits show this work. I made the product and rights decisions: the radio format, local-only boundary, scheduling behavior, catalog themes and prompts, licensing policy, and final editorial choices.
 
 ### Challenges
 
-The hardest problem was preserving the meaning of “live” in a locally produced demo. Browser autoplay restrictions require a gesture, generated speech has variable duration, and a listener may reload midway through the program. Treating the final show as one immutable audio file with a server-authored timeline solved those constraints without exposing playback controls.
+The hardest problem was making a local demo feel live. Browsers require a gesture before playing audio, generated speech varies in length, and listeners may reload during a show. One fixed audio file and a server-authored timeline handle all three cases without exposing playback controls.
 
-Another challenge was allowing creative selection without allowing hallucinated media. The solution was to make GPT-5.6 return only a schema-validated catalog ID and resolve every usable fact on the server.
+The second challenge was letting the model choose creatively without inventing media. GPT-5.6 returns only a schema-validated catalog ID, and the server resolves every fact the app uses.
 
 ### Accomplishments
 
-- A coherent message-to-broadcast flow that can be run locally without accounts.
+- A complete message-to-broadcast flow that runs locally without accounts.
 - A fixed airtime and late-join behavior instead of a disguised playlist player.
-- A rights-recorded original catalog with deterministic analysis and repeatable metadata generation.
-- Stable failure handling that does not leak prompts, API keys, provider responses, or source masters.
+- A catalog of original songs with rights records, deterministic analysis, and repeatable metadata generation.
+- Failure handling that does not leak prompts, API keys, provider responses, or source masters.
 - Unit, integration, and Playwright coverage that uses mock providers and never spends API credits.
 
 ### What I learned
 
-AI is most useful here when it is constrained by a strong editorial and technical frame. The model provides interpretation and personality; the application owns eligibility, facts, timing, state, media access, and failure behavior. I also learned that audio architecture is product architecture: assembling one program file made the experience more convincingly radio-like while simplifying synchronization.
+AI works best here under clear editorial rules and technical limits. The model provides interpretation and personality. The app controls eligibility, facts, timing, state, media access, and failures. I also learned that the audio design shapes the product: one program file feels more like radio and is easier to keep in sync.
 
 ### What's next
 
-The next step is to expand CrowdFM from an isolated demo into one genuinely shared station: accept many messages, let an AI producer shape a scheduled rundown, add human editorial review, synchronize multiple listeners, and build transparent catalog and disclosure tools without giving up the no-skip radio experience.
+Next, I want to turn CrowdFM from a local demo into a shared station. It should accept many messages, let an AI producer plan a schedule, add human editorial review, keep many listeners in sync, and explain how it selects and creates music—all without giving up the no-skip radio experience.
 
 ## Built with
 
